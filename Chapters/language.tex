@@ -1,0 +1,247 @@
+\chapter{Language extension}
+
+Rule basic structure
+\begin{bnf*}
+\bnfprod{rule}{
+    \bnfpn{define} \bnfsp
+    \bnfpn{from} \bnfsp
+    \bnfpn{where} \bnfsp
+    \bnfpn{consuming}
+}
+\end{bnf*}
+
+Outline of each section
+\begin{bnf*}
+\bnfprod{define}{
+    \bnfts{define} \bnfsp
+    \bnfpn{capital name} \bnfsp
+    \bnfts{(} \bnfsp
+    \bnfpn{attributes} \bnfsp
+    \bnfts{)}
+}\\
+\bnfprod{from}{
+    \bnfts{from} \bnfsp
+    \bnfpn{predicate body} \bnfsp
+    \bnfpn{predicates}
+}\\
+\bnfprod{where}{
+    \bnfts{where} \bnfsp
+    \bnfpn{assignments} \bnfor
+    \bnfes
+}\\
+\bnfprod{consuming}{
+    \bnfts{consuming} \bnfsp
+    \bnfpn{capital name} \bnfsp
+    \bnfpn{capital names} \bnfor
+    \bnfes
+}
+\end{bnf*}
+
+Details for define
+\begin{bnf*}
+\bnfprod{attributes}{
+    \bnfpn{attribute} \bnfsp
+    \bnfpn{attributes tail} \bnfor
+    \bnfes
+}\\
+\bnfprod{attributes tail}{
+    \bnfts{,} \bnfsp
+    \bnfpn{attribute} \bnfsp
+    \bnfpn{attributes tail} \bnfor
+    \bnfes
+}\\
+\bnfprod{attribute}{
+    \bnfpn{lower name} \bnfsp
+    \bnfts{:} \bnfsp
+    \bnfpn{attribute type}
+}\\
+\bnfprod{attribute type}{
+    \bnfts{int} \bnfor
+    \bnfts{float} \bnfor
+    \bnfts{bool} \bnfor
+    \bnfts{string}
+}
+\end{bnf*}
+
+Details for from
+\begin{bnf*}
+\bnfprod{predicates}{
+    \bnfts{and} \bnfsp
+    \bnfpn{predicate} \bnfsp
+    \bnfpn{predicates} \bnfor
+    \bnfes
+}\\
+\bnfprod{predicate}{
+    \bnfpn{event} \bnfor
+    \bnfpn{static} \bnfor
+    \bnfpn{aggregate}
+}
+\end{bnf*}
+
+Details for event
+\begin{bnf*}
+\bnfprod{event}{
+    \bnfpn{event selection} \bnfsp
+    \bnfpn{predicate body} \bnfsp
+    \bnfpn{timing}
+}\\
+\bnfprod{event selection}{
+    \bnfts{each} \bnfor
+    \bnfts{not} \bnfor
+    \bnfts{first} \bnfor
+    \bnfts{last}
+}
+\end{bnf*}
+
+Details for static
+\begin{bnf*}
+\bnfprod{static}{
+    \bnfpn{unordered static} \bnfor
+    \bnfpn{ordered static}
+}\\
+\bnfprod{unordered static}{
+    \bnfpn{unordered selection} \bnfsp
+    \bnfpn{predicate body}
+}\\
+\bnfprod{unordered selection}{
+    \bnfts{each} \bnfor
+    \bnfts{any} \bnfor
+    \bnfts{not}
+}\\
+\bnfprod{ordered static}{
+    \bnfpn{ordered selection} \bnfsp
+    \bnfpn{predicate body} \bnfsp
+    \bnfpn{order}
+}\\
+\bnfprod{ordered selection}{
+    \bnfts{first} \bnfor
+    \bnfts{last}
+}\\
+\bnfprod{order}{
+    \bnfts{ordered by} \bnfsp
+    \bnfpn{lower name} \bnfsp
+    \bnfpn{lower names}
+}
+\end{bnf*}
+
+Details for aggregates
+\begin{bnf*}
+\bnfprod{aggregate}{
+    \bnfpn{aggregate body} \bnfsp
+    \bnfpn{aggregate constraint}
+}\\
+\bnfprod{aggregate body}{
+    \bnfpn{aggregator} \bnfsp
+    \bnfts{(} \bnfsp
+    \bnfpn{constrained tuple} \bnfsp
+    \bnfpn{timing} \bnfsp
+    \bnfts{)}
+}\\
+\bnfprod{aggregator}{
+    \bnfts{AVG} \bnfor
+    \bnfts{SUM} \bnfor
+    \bnfts{MAX} \bnfor
+    \bnfts{MIN} \bnfor
+    \bnfts{COUNT}
+}\\
+\bnfprod{aggregate constraint}{ % TODO dettagliare!!!
+    \bnftd{A predicate with possible parameterization}
+}
+\end{bnf*}
+
+Details for timing
+\begin{bnf*}
+\bnfprod{timing}{
+    \bnfpn{within} \bnfor
+    \bnfpn{between}
+}\\
+\bnfprod{within}{
+    \bnfts{within} \bnfsp
+    \bnfpn{time} \bnfsp
+    \bnfts{from} \bnfsp
+    \bnfpn{capital name}
+}\\
+\bnfprod{between}{
+    \bnfts{between} \bnfsp
+    \bnfpn{capital name} \bnfsp
+    \bnfts{and} \bnfsp
+    \bnfpn{capital name}
+}\\
+\bnfprod{time}{
+    \bnfpn{float} \bnfsp
+    \bnfpn{time unit} \bnfsp
+}\\
+\bnfprod{time unit}{
+    \bnfts{d} \bnfor
+    \bnfts{h} \bnfor
+    \bnfts{min} \bnfor
+    \bnfts{s} \bnfor
+    \bnfts{ms} \bnfor
+    \bnfts{us}
+}
+\end{bnf*}
+
+Details for predicate body
+\begin{bnf*}
+\bnfprod{predicate body}{
+    \bnfpn{constrained tuple} \bnfsp
+    \bnfpn{alias}
+}\\
+\bnfprod{constrained tuple}{
+    \bnfpn{capital name} \bnfsp
+    \bnfts{(} \bnfsp
+    \bnfpn{constraints} \bnfsp
+    \bnfts{)}
+}\\
+\bnfprod{constraints}{
+    \bnfpn{constraint} \bnfsp
+    \bnfpn{constraints tail} \bnfor
+    \bnfes
+}\\
+\bnfprod{constraints tail}{
+    \bnfts{and} \bnfsp
+    \bnfpn{constraint} \bnfsp
+    \bnfpn{constraints tail} \bnfor
+    \bnfes
+}\\
+\bnfprod{constraint}{ % TODO dettagliare!!!
+    \bnftd{A predicate with possible parameterization}
+}\\
+\bnfprod{alias}{
+    \bnfts{as} \bnfsp
+    \bnfpn{capital name} \bnfor
+    \bnfes
+}
+\end{bnf*}
+
+Basic types
+\begin{bnf*}
+\bnfprod{capital name}{
+    \bnftd{A name starting with an uppercase letter}
+}\\
+\bnfprod{lower name}{
+    \bnftd{A name starting with a lowercase letter}
+}\\
+\bnfprod{capital names}{
+    \bnfts{,} \bnfsp
+    \bnfpn{capital name} \bnfsp
+    \bnfpn{capital names} \bnfor
+    \bnfes
+}\\
+\bnfprod{lower names}{
+    \bnfts{,} \bnfsp
+    \bnfpn{lower name} \bnfsp
+    \bnfpn{lower names} \bnfor
+    \bnfes
+}\\
+\bnfprod{float}{
+    \bnftd{A floating point number}
+}
+\end{bnf*}
+
+\begin{align*}
+define &\quad CE(Att_1,\ ...\ Att_n) \\
+from   &\quad SE(Att_x\ op\ Val_x)\ and \\
+       &\quad SD(Att_y\ op\ Val_y) \\
+where  &\quad Att_1\ =\ f_1\ ...\ Att_n\ =\ f_n
+\end{align*}

@@ -1,0 +1,41 @@
+% book example for classicthesis.sty
+\documentclass[
+  % Replace twoside with oneside if you are printing your thesis on a single side
+  % of the paper, or for viewing on screen.
+  oneside,
+  %twoside,
+  11pt, a4paper,
+  footinclude=true,
+  headinclude=true,
+  cleardoublepage=empty
+]{scrbook}
+
+\usepackage{lipsum}
+\usepackage[linedheaders,parts,pdfspacing]{classicthesis}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{acronym}
+\usepackage[epsilon,tstt]{backnaur}
+
+\title{Thesis Title}
+\author{Angelo Di Pilla}
+
+\includeonly{Chapters/language}
+
+\begin{document}
+
+\maketitle
+
+\include{FrontBackMatter/abstract}
+\include{FrontBackMatter/dedication}
+\include{FrontBackMatter/acknowledgements}
+\include{FrontBackMatter/declaration}
+\include{FrontBackMatter/contents}
+
+\part{First Part of My Thesis}
+
+\include{Chapters/language}
+
+\include{Chapters/placeholder}
+
+\end{document}
