@@ -267,10 +267,13 @@ Details for expressions and constraints
     \bnfpn{immediate}
 }\\
 \bnfprod{identifier}{
-    \bnfpn{lower identifier} \bnfor
-    \bnfpn{capital identifier} \bnfsp
-    \bnfts{.} \bnfsp
+	\bnfpn{qualifier} \bnfsp
     \bnfpn{lower identifier}
+}\\
+\bnfprod{qualifier}{
+    \bnfpn{capital identifier} \bnfsp
+    \bnfts{.} \bnfor
+    \bnfes
 }\\
 \bnfprod{parameter}{
     \bnfts{\$} \bnfsp
