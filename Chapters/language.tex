@@ -14,7 +14,7 @@ Outline of each section
 \begin{bnf*}
 \bnfprod{define}{
     \bnfts{define} \bnfsp
-    \bnfpn{capital name} \bnfsp
+    \bnfpn{capital identifier} \bnfsp
     \bnfts{(} \bnfsp
     \bnfpn{attributes} \bnfsp
     \bnfts{)}
@@ -31,8 +31,8 @@ Outline of each section
 }\\
 \bnfprod{consuming}{
     \bnfts{consuming} \bnfsp
-    \bnfpn{capital name} \bnfsp
-    \bnfpn{capital names} \bnfor
+    \bnfpn{capital identifier} \bnfsp
+    \bnfpn{capital identifiers} \bnfor
     \bnfes
 }
 \end{bnf*}
@@ -51,7 +51,7 @@ Details for define
     \bnfes
 }\\
 \bnfprod{attribute}{
-    \bnfpn{lower name} \bnfsp
+    \bnfpn{lower identifier} \bnfsp
     \bnfts{:} \bnfsp
     \bnfpn{attribute type}
 }\\
@@ -73,8 +73,57 @@ Details for from
 }\\
 \bnfprod{predicate}{
     \bnfpn{event} \bnfor
-    \bnfpn{static} \bnfor
-    \bnfpn{aggregate}
+    \bnfpn{aggregate} \bnfor
+    \bnfpn{static}
+}
+\end{bnf*}
+
+Details for where
+\begin{bnf*}
+\bnfprod{assignments}{
+    \bnfpn{assignment} \bnfsp
+    \bnfpn{assignments tail}
+}\\
+\bnfprod{assignments tail}{
+    \bnfts{,} \bnfsp
+    \bnfpn{assignment} \bnfsp
+    \bnfpn{assignments tail} \bnfor
+    \bnfes
+}\\
+\bnfprod{assignment}{
+    \bnfpn{lower identifier} \bnfsp
+    \bnfts{=} \bnfsp
+    \bnfpn{expression}
+}
+\end{bnf*}
+
+Details for predicate body
+\begin{bnf*}
+\bnfprod{predicate body}{
+    \bnfpn{constrained tuple} \bnfsp
+    \bnfpn{alias}
+}\\
+\bnfprod{constrained tuple}{
+    \bnfpn{capital identifier} \bnfsp
+    \bnfts{(} \bnfsp
+    \bnfpn{constraints} \bnfsp
+    \bnfts{)}
+}\\
+\bnfprod{constraints}{
+    \bnfpn{expression} \bnfsp
+    \bnfpn{constraints tail} \bnfor
+    \bnfes
+}\\
+\bnfprod{constraints tail}{
+    \bnfts{,} \bnfsp
+    \bnfpn{expression} \bnfsp
+    \bnfpn{constraints tail} \bnfor
+    \bnfes
+}\\
+\bnfprod{alias}{
+    \bnfts{as} \bnfsp
+    \bnfpn{capital identifier} \bnfor
+    \bnfes
 }
 \end{bnf*}
 
@@ -90,6 +139,31 @@ Details for event
     \bnfts{not} \bnfor
     \bnfts{first} \bnfor
     \bnfts{last}
+}
+\end{bnf*}
+
+Details for aggregates
+\begin{bnf*}
+\bnfprod{aggregate}{
+    \bnfpn{aggregate body} \bnfsp
+    \bnfpn{aggregate constraint}
+}\\
+\bnfprod{aggregate body}{
+    \bnfpn{aggregator} \bnfsp
+    \bnfts{(} \bnfsp
+    \bnfpn{constrained tuple} \bnfsp
+    \bnfpn{timing} \bnfsp
+    \bnfts{)}
+}\\
+\bnfprod{aggregator}{
+    \bnfts{AVG} \bnfor
+    \bnfts{SUM} \bnfor
+    \bnfts{MAX} \bnfor
+    \bnfts{MIN} \bnfor
+    \bnfts{COUNT}
+}\\
+\bnfprod{aggregate constraint}{ % TODO dettagliare!!!
+    \bnftd{A predicate with possible parameterization}
 }
 \end{bnf*}
 
@@ -119,33 +193,8 @@ Details for static
 }\\
 \bnfprod{order}{
     \bnfts{ordered by} \bnfsp
-    \bnfpn{lower name} \bnfsp
-    \bnfpn{lower names}
-}
-\end{bnf*}
-
-Details for aggregates
-\begin{bnf*}
-\bnfprod{aggregate}{
-    \bnfpn{aggregate body} \bnfsp
-    \bnfpn{aggregate constraint}
-}\\
-\bnfprod{aggregate body}{
-    \bnfpn{aggregator} \bnfsp
-    \bnfts{(} \bnfsp
-    \bnfpn{constrained tuple} \bnfsp
-    \bnfpn{timing} \bnfsp
-    \bnfts{)}
-}\\
-\bnfprod{aggregator}{
-    \bnfts{AVG} \bnfor
-    \bnfts{SUM} \bnfor
-    \bnfts{MAX} \bnfor
-    \bnfts{MIN} \bnfor
-    \bnfts{COUNT}
-}\\
-\bnfprod{aggregate constraint}{ % TODO dettagliare!!!
-    \bnftd{A predicate with possible parameterization}
+    \bnfpn{lower identifier} \bnfsp
+    \bnfpn{lower identifiers}
 }
 \end{bnf*}
 
@@ -159,13 +208,13 @@ Details for timing
     \bnfts{within} \bnfsp
     \bnfpn{time} \bnfsp
     \bnfts{from} \bnfsp
-    \bnfpn{capital name}
+    \bnfpn{capital identifier}
 }\\
 \bnfprod{between}{
     \bnfts{between} \bnfsp
-    \bnfpn{capital name} \bnfsp
+    \bnfpn{capital identifier} \bnfsp
     \bnfts{and} \bnfsp
-    \bnfpn{capital name}
+    \bnfpn{capital identifier}
 }\\
 \bnfprod{time}{
     \bnfpn{float} \bnfsp
@@ -181,57 +230,75 @@ Details for timing
 }
 \end{bnf*}
 
-Details for predicate body
+Details for expressions and constraints
 \begin{bnf*}
-\bnfprod{predicate body}{
-    \bnfpn{constrained tuple} \bnfsp
-    \bnfpn{alias}
+\bnfprod{expression}{
+    \bnfpn{parenthesization} \bnfor
+    \bnfpn{operation} \bnfor
+	\bnfpn{atom}
 }\\
-\bnfprod{constrained tuple}{
-    \bnfpn{capital name} \bnfsp
-    \bnfts{(} \bnfsp
-    \bnfpn{constraints} \bnfsp
+\bnfprod{parenthesization}{
+	\bnfts{(} \bnfsp
+    \bnfpn{expression} \bnfsp
     \bnfts{)}
 }\\
-\bnfprod{constraints}{
-    \bnfpn{constraint} \bnfsp
-    \bnfpn{constraints tail} \bnfor
-    \bnfes
+\bnfprod{operation}{
+    \bnfpn{binary operation} \bnfor
+    \bnfpn{unary operation}
 }\\
-\bnfprod{constraints tail}{
-    \bnfts{,} \bnfsp
-    \bnfpn{constraint} \bnfsp
-    \bnfpn{constraints tail} \bnfor
-    \bnfes
+\bnfprod{binary operation}{
+    \bnfpn{expression} \bnfsp
+    \bnfpn{binary operator} \bnfsp
+    \bnfpn{expression}
 }\\
-\bnfprod{constraint}{ % TODO dettagliare!!!
-    \bnftd{A predicate with possible parameterization}
+\bnfprod{unary operation}{
+    \bnfpn{unary operator} \bnfsp
+    \bnfpn{expression}
 }\\
-\bnfprod{alias}{
-    \bnfts{as} \bnfsp
-    \bnfpn{capital name} \bnfor
-    \bnfes
+\bnfprod{binary operator}{
+    \bnftd{Common algebraic and comparison operators}
+}\\
+\bnfprod{unary operator}{
+    \bnftd{Common unary operators}
+}\\
+\bnfprod{atom}{
+    \bnfpn{identifier} \bnfor
+    \bnfpn{parameter} \bnfor
+    \bnfpn{immediate}
+}\\
+\bnfprod{identifier}{
+    \bnfpn{lower identifier} \bnfor
+    \bnfpn{capital identifier} \bnfsp
+    \bnfts{.} \bnfsp
+    \bnfpn{lower identifier}
+}\\
+\bnfprod{parameter}{
+    \bnfts{\$} \bnfsp
+    \bnfpn{lower identifier}
+}\\
+\bnfprod{immediate}{
+    \bnftd{An immediate value, like a digit}
 }
 \end{bnf*}
 
 Basic types
 \begin{bnf*}
-\bnfprod{capital name}{
-    \bnftd{A name starting with an uppercase letter}
+\bnfprod{capital identifier}{
+    \bnftd{An identifier starting with an uppercase letter}
 }\\
-\bnfprod{lower name}{
-    \bnftd{A name starting with a lowercase letter}
+\bnfprod{lower identifier}{
+    \bnftd{An identifier starting with a lowercase letter}
 }\\
-\bnfprod{capital names}{
+\bnfprod{capital identifiers}{
     \bnfts{,} \bnfsp
-    \bnfpn{capital name} \bnfsp
-    \bnfpn{capital names} \bnfor
+    \bnfpn{capital identifier} \bnfsp
+    \bnfpn{capital identifiers} \bnfor
     \bnfes
 }\\
-\bnfprod{lower names}{
+\bnfprod{lower identifiers}{
     \bnfts{,} \bnfsp
-    \bnfpn{lower name} \bnfsp
-    \bnfpn{lower names} \bnfor
+    \bnfpn{lower identifier} \bnfsp
+    \bnfpn{lower identifiers} \bnfor
     \bnfes
 }\\
 \bnfprod{float}{
