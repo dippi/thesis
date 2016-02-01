@@ -115,7 +115,7 @@ Details for predicate body
     \bnfes
 }\\
 \bnfprod{constraints tail}{
-    \bnfts{,} \bnfsp
+    \bnfts{,} \bnfsp % Different from original papers!
     \bnfpn{expression} \bnfsp
     \bnfpn{constraints tail} \bnfor
     \bnfes
@@ -162,8 +162,9 @@ Details for aggregates
     \bnfts{MIN} \bnfor
     \bnfts{COUNT}
 }\\
-\bnfprod{aggregate constraint}{ % TODO dettagliare!!!
-    \bnftd{A predicate with possible parameterization}
+\bnfprod{aggregate constraint}{
+    \bnfpn{binary operator} \bnfsp
+    \bnfpn{expression}
 }
 \end{bnf*}
 
@@ -312,6 +313,19 @@ Basic types
 \begin{align*}
 define &\quad CE(Att_1,\ ...\ Att_n) \\
 from   &\quad SE(Att_x\ op\ Val_x)\ and \\
-       &\quad SD(Att_y\ op\ Val_y) \\
+       &\quad each\ SD(Att_y\ op\ Val_y) \\
 where  &\quad Att_1\ =\ f_1\ ...\ Att_n\ =\ f_n
+\end{align*}
+
+In the original paper have been defined the concept of $label$, to uniquely identify an event notification, the function $lab(Rule, Labels)$, to assign a label to a newly generated complex event, the trio predicate $Occurs(Type, Label)$ and the trio function $attVal(Label, Attribute)$.\\
+Static data are quite similar to event notifications, so it's simple to extend the previous concepts to take them in to account.\\
+We can extend labels to identify tuples too; the function $lab$ isn't changed and we can prove that the \emph{uniqueness of selection} remains valid; the predicate $Occurs$ is not relevant, since a tuple remains unchanged in every time instant; finally the function $attVal$ can be extended to return static tuple attributes.
+
+%we can extend labels to identify them too. In this way they can concur in label generation for complex event
+%To extend the language with static data, it is sufficient to say that every static tuple, event notification, is identified by a label too
+
+\begin{align*}
+&define\ CE\ from\ SE\ and\ each\ SD\ \triangleq\\
+&Occurs(CE, lab(r, \{l_0, l_1\})\ \leftrightarrow\\
+&(Occurs(SE, l_0)\ \wedge\ WithinP(Occurs(B, l_1),Time(l_0),x))
 \end{align*}
