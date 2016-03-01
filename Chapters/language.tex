@@ -1,6 +1,10 @@
 \chapter{Language extension}
 
-Rule basic structure
+\section{Tesla BNF Grammar}
+% TODO add short intro
+
+\subsection{Rule basic structure}
+% TODO add short description
 \begin{bnf*}
 \bnfprod{rule}{
     \bnfpn{define} \bnfsp
@@ -10,7 +14,8 @@ Rule basic structure
 }
 \end{bnf*}
 
-Outline of each section
+\subsection{Outline of each section}
+% TODO add short description
 \begin{bnf*}
 \bnfprod{define}{
     \bnfts{define} \bnfsp
@@ -37,7 +42,8 @@ Outline of each section
 }
 \end{bnf*}
 
-Details for define
+\subsection{Details for define}
+% TODO add short description
 \begin{bnf*}
 \bnfprod{attributes}{
     \bnfpn{attribute} \bnfsp
@@ -63,7 +69,8 @@ Details for define
 }
 \end{bnf*}
 
-Details for from
+\subsection{Details for from}
+% TODO add short description
 \begin{bnf*}
 \bnfprod{predicates}{
     \bnfts{and} \bnfsp
@@ -78,7 +85,8 @@ Details for from
 }
 \end{bnf*}
 
-Details for where
+\subsection{Details for where}
+% TODO add short description
 \begin{bnf*}
 \bnfprod{assignments}{
     \bnfpn{assignment} \bnfsp
@@ -97,7 +105,8 @@ Details for where
 }
 \end{bnf*}
 
-Details for predicate body
+\subsection{Details for predicate body}
+% TODO add short description
 \begin{bnf*}
 \bnfprod{predicate body}{
     \bnfpn{constrained tuple} \bnfsp
@@ -127,7 +136,8 @@ Details for predicate body
 }
 \end{bnf*}
 
-Details for event
+\subsection{Details for event}
+% TODO add short description
 \begin{bnf*}
 \bnfprod{event}{
     \bnfpn{event selection} \bnfsp
@@ -142,7 +152,8 @@ Details for event
 }
 \end{bnf*}
 
-Details for aggregates
+\subsection{Details for aggregates}
+% TODO add short description
 \begin{bnf*}
 \bnfprod{aggregate}{
     \bnfpn{aggregate body} \bnfsp
@@ -168,7 +179,8 @@ Details for aggregates
 }
 \end{bnf*}
 
-Details for static
+\subsection{Details for static}
+% TODO add short description
 \begin{bnf*}
 \bnfprod{static}{
     \bnfpn{unordered static} \bnfor
@@ -180,7 +192,7 @@ Details for static
 }\\
 \bnfprod{unordered selection}{
     \bnfts{each} \bnfor
-    \bnfts{any} \bnfor
+%    \bnfts{any} \bnfor % FIXME maybe move in aggregates
     \bnfts{not}
 }\\
 \bnfprod{ordered static}{
@@ -199,7 +211,8 @@ Details for static
 }
 \end{bnf*}
 
-Details for timing
+\subsection{Details for timing}
+% TODO add short description
 \begin{bnf*}
 \bnfprod{timing}{
     \bnfpn{within} \bnfor
@@ -231,7 +244,8 @@ Details for timing
 }
 \end{bnf*}
 
-Details for expressions and constraints
+\subsection{Details for expressions and constraints}
+% TODO add short description
 \begin{bnf*}
 \bnfprod{expression}{
     \bnfpn{parenthesization} \bnfor
@@ -285,7 +299,8 @@ Details for expressions and constraints
 }
 \end{bnf*}
 
-Basic types
+\subsection{Basic types}
+% TODO add short description
 \begin{bnf*}
 \bnfprod{capital identifier}{
     \bnftd{An identifier starting with an uppercase letter}
@@ -310,22 +325,75 @@ Basic types
 }
 \end{bnf*}
 
+% \begin{align*}
+% define &\quad CE(Att_1,\ ...\ Att_n) \\
+% from   &\quad SE(Att_x\ op\ Val_x)\ and \\
+%        &\quad each\ SD(Att_y\ op\ Val_y) \\
+% where  &\quad Att_1\ =\ f_1\ ...\ Att_n\ =\ f_n
+% \end{align*}
+
+\section{Semantic of rules}
+
+\subsection{Extension of logical concepts}
+The original paper defines the concept of $label$, to uniquely identify an event notification, the function $lab(Rule, Labels)$, to assign a label to a newly generated complex event, the trio predicate $Occurs(Type, Label)$ and the trio function $attVal(Label, Attribute)$.\\
+Static data are quite similar to event notifications, so it's simple to extend the previous concepts to take them in to account.
+
+\subsubsection{Labels and uniqueness of selection}
+We can extend the meaning of labels to identify data too, so that a label can be associated to an event notification or to a tuple and only one of them. In this way the function $lab$ isn't changed, making no distinction between what labels are associated to, and the \emph{uniqueness of selection} remains valid, because a trigger event is still required.
+
+\subsubsection{Definition of predicate $ThereIs$}
+The predicate $Occurs$ is not applicable, since a tuple remains unchanged in every time instant, so we define the predicate $ThereIs(Type, Label)$ for the similar purpose of stating that a label is associated to a tuple of a given type.
+
 \begin{align*}
-define &\quad CE(Att_1,\ ...\ Att_n) \\
-from   &\quad SE(Att_x\ op\ Val_x)\ and \\
-       &\quad each\ SD(Att_y\ op\ Val_y) \\
-where  &\quad Att_1\ =\ f_1\ ...\ Att_n\ =\ f_n
+  &Alw(\forall s \in S, \forall e \in E, \forall l \in L\\
+  &(ThereIs(s, l) \rightarrow Alw(\neg Occurs(e, l))))
 \end{align*}
 
-In the original paper have been defined the concept of $label$, to uniquely identify an event notification, the function $lab(Rule, Labels)$, to assign a label to a newly generated complex event, the trio predicate $Occurs(Type, Label)$ and the trio function $attVal(Label, Attribute)$.\\
-Static data are quite similar to event notifications, so it's simple to extend the previous concepts to take them in to account.\\
-We can extend labels to identify tuples too; the function $lab$ isn't changed and we can prove that the \emph{uniqueness of selection} remains valid; the predicate $Occurs$ is not relevant, since a tuple remains unchanged in every time instant; finally the function $attVal$ can be extended to return static tuple attributes.
-
-%we can extend labels to identify them too. In this way they can concur in label generation for complex event
-%To extend the language with static data, it is sufficient to say that every static tuple, event notification, is identified by a label too
+\begin{align*}
+  &Alw(\forall s_1,s_2 \in S, \forall l \in L\\
+  &((ThereIs(s_1, l) \wedge ThereIs(s_2, l)) \rightarrow s_1=s_2))
+\end{align*}
 
 \begin{align*}
+  &Alw(\forall s \in S, \forall l \in L\\
+  &(ThereIs(s, l) \rightarrow Alw(ThereIs(s, l)))
+\end{align*}
+
+Where $L$ is the set of all labels, $E$ the set of all event types and $S$ the set of all static data types.\\
+The first formula states that a label cannot be associated with both a tuple and an event. The second states that cannot be two tuple having the same label and different data type. The third states that if a tuple exist at a certain point in time it exists along the whole time line.
+
+\subsubsection{Extension of predicate $attVal$}
+Similarly the function $attVal$ can be extended to return attributes of static tuples.
+
+\subsection{Event composition}
+% TODO add a short description
+\begin{align*}% Example of each
 &define\ CE\ from\ SE\ and\ each\ SD\ \triangleq\\
 &Occurs(CE, lab(r, \{l_0, l_1\})\ \leftrightarrow\\
-&(Occurs(SE, l_0)\ \wedge\ WithinP(Occurs(B, l_1),Time(l_0),x))
+&(Occurs(SE, l_0)\ \wedge\ ThereIs(SD, l_1))
 \end{align*}
+
+\begin{align*}% Example of not
+&define\ CE\ from\ SE\ and\ not\ SD\ \triangleq\\
+&Occurs(CE, lab(r, \{l_0\})\ \leftrightarrow\\
+&(Occurs(SE, l_0)\ \wedge\ \not \exists l_1 ThereIs(SD, l_1))
+\end{align*}
+
+\begin{align*}% Example of first
+&define\ CE\ from\ SE\ and\ first\ SD\ order\ by\ Att_1\triangleq\\
+&Occurs(CE, lab(r, \{l_0, l_1\})\ \leftrightarrow\ (Occurs(SE, l_0)\ \wedge\ ThereIs(SD, l_1)\\
+&\wedge\ (\not \exists l_2\ (ThereIs(SD, l_2)\ \wedge\ (attVal(l_1, Att_1)\ <\ attVal(l_2, Att_1)))))
+\end{align*}
+
+\begin{align*}% Example of last
+&define\ CE\ from\ SE\ and\ last\ SD\ order\ by\ Att_1\triangleq\\
+&Occurs(CE, lab(r, \{l_0, l_1\})\ \leftrightarrow\ (Occurs(SE, l_0)\ \wedge\ ThereIs(SD, l_1)\\
+&\wedge\ (\not \exists l_2\ (ThereIs(SD, l_2)\ \wedge\ (attVal(l_1, Att_1)\ >\ attVal(l_2, Att_1)))))
+\end{align*}
+
+\begin{align*}% Example of attribute constraint
+&define\ CE\ from\ SE\ and\ each\ SD(Att_1\ op \ Val_1)\ \triangleq\\
+&Occurs(CE, lab(r, \{l_0, l_1\})\ \leftrightarrow\ (Occurs(SE, l_0)\\
+&\wedge\ ThereIs(SD, l_1)\ \wedge\ (attVal(l_1, Att_1)\ op\ Val_1))
+\end{align*}
+% TODO maybe add examples of aggregates and parameters..something else?
