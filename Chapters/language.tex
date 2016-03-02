@@ -1,5 +1,7 @@
 \chapter{Language extension}
 
+% TODO rationale on languages needs and choices
+
 \section{Tesla BNF Grammar}
 % TODO add short intro
 
@@ -146,7 +148,7 @@
 }\\
 \bnfprod{event selection}{
     \bnfts{each} \bnfor
-    \bnfts{not} \bnfor
+    \bnfts{not} \bnfor % TODO maybe move in aggregates
     \bnfts{first} \bnfor
     \bnfts{last}
 }
@@ -172,6 +174,7 @@
     \bnfts{MAX} \bnfor
     \bnfts{MIN} \bnfor
     \bnfts{COUNT}
+    % TODO maybe add EXISTS/ANY and NOT
 }\\
 \bnfprod{aggregate constraint}{
     \bnfpn{binary operator} \bnfsp
@@ -192,8 +195,8 @@
 }\\
 \bnfprod{unordered selection}{
     \bnfts{each} \bnfor
-%    \bnfts{any} \bnfor % FIXME maybe move in aggregates
-    \bnfts{not}
+    \bnfts{any} \bnfor % TODO maybe move in aggregates
+    \bnfts{not} % TODO maybe move in aggregates
 }\\
 \bnfprod{ordered static}{
     \bnfpn{ordered selection} \bnfsp
@@ -396,4 +399,19 @@ Similarly the function $attVal$ can be extended to return attributes of static t
 &Occurs(CE, lab(r, \{l_0, l_1\})\ \leftrightarrow\ (Occurs(SE, l_0)\\
 &\wedge\ ThereIs(SD, l_1)\ \wedge\ (attVal(l_1, Att_1)\ op\ Val_1))
 \end{align*}
-% TODO maybe add examples of aggregates and parameters..something else?
+
+\begin{align*}% Example of aggregates
+&define\ CE\ from\ SE\ and\ AGGR(SD.Att_1)\ op\ Y\ \triangleq\\
+&Occurs(CE, lab(r, \{l_0\})\ \leftrightarrow\ (Occurs(SE, l_0)\\
+&\wedge\ \forall Set\ (\forall x, \forall l \in L
+(x \in Set\ \leftrightarrow\ (ThereIs(SD, l)\\
+&\wedge\ x\ =\ attVal(l, Att_1))))\ \wedge\ AGGR(Set)\ op\ Y)
+\end{align*}
+
+\begin{align*}% Example of parameters
+&define\ CE\ from\ SE(Att_i\ = \ \$Par)\ and\ each\ SD(Att_j\ = \ \$Par)\ \triangleq\\
+&Occurs(CE, lab(r, \{l_0, l_1\})\ \leftrightarrow\ (Occurs(SE, l_0)\\
+&\wedge\ ThereIs(SD, l_1)\ \wedge\ (attVal(l_0, Att_i)\ =\ attVal(l_1, Att_j)))
+\end{align*}
+
+% TODO maybe example of parametrization and aggregates?

@@ -1,0 +1,43 @@
+\chapter{Map TESLA to SQL}
+
+\subsection{Event composition}
+% TODO add a short description
+\begin{align*}% Example of each
+&each\ SD\ \triangleq\ SELECT\ id[,\ ...]\ FROM\ SD;
+\end{align*}
+
+\begin{align*}% Example of not
+&not\ SD\ \triangleq\ SELECT\ NOT\ EXIST\ (SELECT\ 1\ FROM\ SD);
+% For unexpected speed difference consider also:
+% SELECT (SELECT id FROM SD) IS NULL;
+% SELECT id FROM SD LIMIT 1;
+\end{align*}
+
+\begin{align*}% Example of first
+&first\ SD\ order\ by\ Att_1[,\ ...]\triangleq\\
+&SELECT\ id[,\ ...]\ FROM\ SD\ ORDER\ BY\ Att_1[,\ ...]\ ASC[\ LIMIT\ 1];
+\end{align*}
+
+\begin{align*}% Example of last
+&last\ SD\ order\ by\ Att_1[,\ ...]\triangleq\\
+&SELECT\ id[,\ ...]\ FROM\ SD\ ORDER\ BY\ Att_1[,\ ...]\ DESC[\ LIMIT\ 1];
+\end{align*}
+
+\begin{align*}% Example of attribute constraint
+&each\ SD(Att_1\ op \ Val_1)\ \triangleq\\
+&SELECT\ id[,\ ...]\ FROM\ SD\ WHERE\ Att_1\ op\ Val_1;
+\end{align*}
+
+\begin{align*}% Example of aggregates
+&AGGR(SD.Att_1)\ op\ Y\ \triangleq\\
+&SELECT\ EXISTS\ (SELECT\ 1\ FROM\ SD\ WHERE\ AGGR(Att_1)\ op\ Y)
+\end{align*}
+
+\begin{align*}% Example of parameters
+&define\ CE\ from\ SE(Att_i\ = \ \$Par)\ and\ each\ SD(Att_j\ = \ \$Par)\ \triangleq\\
+&SELECT\ id[,\ ...]\ FROM\ SD\ WHERE\ Att_j\ =\ \$Par;
+\end{align*}
+
+% TODO maybe example of parametrization and aggregates?
+
+% TODO example on how selection attributes are chosen (parameters and assignment in where clause)
