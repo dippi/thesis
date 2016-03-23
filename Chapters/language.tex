@@ -324,9 +324,400 @@
     \bnfes
 }\\
 \bnfprod{float}{
-    \bnftd{A floating point number}
+    \bnfpn{digits} \bnfsp
+    \bnfts{.} \bnfsp
+    \bnfpn{digits}
+}\\
+\bnfprod{digits}{
+    \bnfpn{digit} \bnfsp
+    \bnfpn{digits} \bnfor
+    \bnfes
+}\\
+\bnfprod{digit}{
+    \bnftd{A single digit [0-9]}
 }
 \end{bnf*}
+
+% ===== NEW SYNTAX =====
+
+% TODO explain what was ambiguous and all the choices made
+
+\section{Tesla BNF Grammar - New}
+% TODO add short intro
+
+\subsection{Event type declaration}
+% TODO add short description
+\begin{bnf*}
+\bnfprod{declaration}{
+    \bnfpn{declare} \bnfsp
+    \bnfpn{capital identifier} \bnfsp
+    \bnfts{(} \bnfsp
+    \bnfpn{attributes} \bnfsp
+    \bnfts{)}
+    \bnfpn{with id}
+}\\
+\bnfprod{declare}{
+    \bnfts{declare} \bnfor
+    \bnfts{declare fact}
+}\\
+\bnfprod{attributes}{
+    \bnfpn{attribute} \bnfsp
+    \bnfpn{attributes tail} \bnfor
+    \bnfes
+}\\
+\bnfprod{attributes tail}{
+    \bnfts{,} \bnfsp
+    \bnfpn{attribute} \bnfsp
+    \bnfpn{attributes tail} \bnfor
+    \bnfes
+}\\
+\bnfprod{attribute}{
+    \bnfpn{lower identifier} \bnfsp
+    \bnfts{:} \bnfsp
+    \bnfpn{attribute type}
+}\\
+\bnfprod{attribute type}{
+    \bnfts{int} \bnfor
+    \bnfts{float} \bnfor
+    \bnfts{bool} \bnfor
+    \bnfts{string}
+}\\
+\bnfprod{with id}{
+    \bnfts{with id} \bnfsp
+    \bnfpn{digits}
+}
+\end{bnf*}
+
+\subsection{Event generation rule structure}
+% TODO add short description
+\begin{bnf*}
+\bnfprod{rule}{
+    \bnfpn{from} \bnfsp
+    \bnfpn{where} \bnfsp
+    \bnfpn{emit} \bnfsp
+    \bnfpn{consuming}
+}
+\end{bnf*}
+
+\subsection{Outline of each section}
+% TODO add short description
+\begin{bnf*}
+\bnfprod{from}{
+    \bnfts{from} \bnfsp
+    \bnfpn{predicate body} \bnfsp
+    \bnfpn{predicates}
+}\\
+\bnfprod{where}{
+    \bnfts{where} \bnfsp
+    \bnfpn{filters} \bnfor
+    \bnfes
+}\\
+\bnfprod{emit}{
+    \bnfts{emit} \bnfsp
+    \bnfpn{capital identifier} \bnfsp
+    \bnfts{(} \bnfsp
+    \bnfpn{assignments} \bnfsp
+    \bnfts{)}
+}\\
+\bnfprod{consuming}{
+    \bnfts{consuming} \bnfsp
+    \bnfpn{capital identifier} \bnfsp
+    \bnfpn{capital identifiers} \bnfor
+    \bnfes
+}
+\end{bnf*}
+
+\subsection{Details for emit}
+% TODO add short description
+\begin{bnf*}
+\bnfprod{assignments}{
+    \bnfpn{assignment} \bnfsp
+    \bnfpn{assignments tail} \bnfor
+    \bnfes
+}\\
+\bnfprod{assignments tail}{
+    \bnfts{,} \bnfsp
+    \bnfpn{assignment} \bnfsp
+    \bnfpn{assignments tail} \bnfor
+    \bnfes
+}\\
+\bnfprod{assignments}{
+    \bnfpn{lower identifier} \bnfsp
+    \bnfts{=} \bnfsp
+    \bnfpn{assignment expression}
+}\\
+\bnfprod{assignment expression}{
+	% TODO define ...
+}
+\end{bnf*}
+
+\subsection{Details for from}
+% TODO add short description
+\begin{bnf*}
+\bnfprod{predicates}{
+    \bnfts{and} \bnfsp
+    \bnfpn{predicate} \bnfsp
+    \bnfpn{predicates} \bnfor
+    \bnfes
+}\\
+\bnfprod{predicate}{
+    \bnfpn{event} \bnfor
+    \bnfpn{aggregate} \bnfor
+    \bnfpn{static}
+}
+\end{bnf*}
+
+\subsection{Details for where}
+% TODO add short description
+\begin{bnf*}
+\bnfprod{assignments}{
+    \bnfpn{assignment} \bnfsp
+    \bnfpn{assignments tail}
+}\\
+\bnfprod{assignments tail}{
+    \bnfts{,} \bnfsp
+    \bnfpn{assignment} \bnfsp
+    \bnfpn{assignments tail} \bnfor
+    \bnfes
+}\\
+\bnfprod{assignment}{
+    \bnfpn{lower identifier} \bnfsp
+    \bnfts{=} \bnfsp
+    \bnfpn{expression}
+}
+\end{bnf*}
+
+\subsection{Details for predicate body}
+% TODO add short description
+\begin{bnf*}
+\bnfprod{predicate body}{
+    \bnfpn{constrained tuple} \bnfsp
+    \bnfpn{alias}
+}\\
+\bnfprod{constrained tuple}{
+    \bnfpn{capital identifier} \bnfsp
+    \bnfts{(} \bnfsp
+    \bnfpn{constraints} \bnfsp
+    \bnfts{)}
+}\\
+\bnfprod{constraints}{
+    \bnfpn{expression} \bnfsp
+    \bnfpn{constraints tail} \bnfor
+    \bnfes
+}\\
+\bnfprod{constraints tail}{
+    \bnfts{,} \bnfsp % Different from original papers!
+    \bnfpn{expression} \bnfsp
+    \bnfpn{constraints tail} \bnfor
+    \bnfes
+}\\
+\bnfprod{alias}{
+    \bnfts{as} \bnfsp
+    \bnfpn{capital identifier} \bnfor
+    \bnfes
+}
+\end{bnf*}
+
+\subsection{Details for event}
+% TODO add short description
+\begin{bnf*}
+\bnfprod{event}{
+    \bnfpn{event selection} \bnfsp
+    \bnfpn{predicate body} \bnfsp
+    \bnfpn{timing}
+}\\
+\bnfprod{event selection}{
+    \bnfts{each} \bnfor
+    \bnfts{not} \bnfor % TODO maybe move in aggregates
+    \bnfts{first} \bnfor
+    \bnfts{last}
+}
+\end{bnf*}
+
+\subsection{Details for aggregates}
+% TODO add short description
+\begin{bnf*}
+\bnfprod{aggregate}{
+    \bnfpn{aggregate body} \bnfsp
+    \bnfpn{aggregate constraint}
+}\\
+\bnfprod{aggregate body}{
+    \bnfpn{aggregator} \bnfsp
+    \bnfts{(} \bnfsp
+    \bnfpn{constrained tuple} \bnfsp
+    \bnfpn{timing} \bnfsp
+    \bnfts{)}
+}\\
+\bnfprod{aggregator}{
+    \bnfts{AVG} \bnfor
+    \bnfts{SUM} \bnfor
+    \bnfts{MAX} \bnfor
+    \bnfts{MIN} \bnfor
+    \bnfts{COUNT}
+    % TODO maybe add EXISTS/ANY and NOT
+}\\
+\bnfprod{aggregate constraint}{
+    \bnfpn{binary operator} \bnfsp
+    \bnfpn{expression}
+}
+\end{bnf*}
+
+\subsection{Details for static}
+% TODO add short description
+\begin{bnf*}
+\bnfprod{static}{
+    \bnfpn{unordered static} \bnfor
+    \bnfpn{ordered static}
+}\\
+\bnfprod{unordered static}{
+    \bnfpn{unordered selection} \bnfsp
+    \bnfpn{predicate body}
+}\\
+\bnfprod{unordered selection}{
+    \bnfts{each} \bnfor
+    \bnfts{any} \bnfor % TODO maybe move in aggregates
+    \bnfts{not} % TODO maybe move in aggregates
+}\\
+\bnfprod{ordered static}{
+    \bnfpn{ordered selection} \bnfsp
+    \bnfpn{predicate body} \bnfsp
+    \bnfpn{order}
+}\\
+\bnfprod{ordered selection}{
+    \bnfts{first} \bnfor
+    \bnfts{last}
+}\\
+\bnfprod{order}{
+    \bnfts{ordered by} \bnfsp
+    \bnfpn{lower identifier} \bnfsp
+    \bnfpn{lower identifiers}
+}
+\end{bnf*}
+
+\subsection{Details for timing}
+% TODO add short description
+\begin{bnf*}
+\bnfprod{timing}{
+    \bnfpn{within} \bnfor
+    \bnfpn{between}
+}\\
+\bnfprod{within}{
+    \bnfts{within} \bnfsp
+    \bnfpn{time} \bnfsp
+    \bnfts{from} \bnfsp
+    \bnfpn{capital identifier}
+}\\
+\bnfprod{between}{
+    \bnfts{between} \bnfsp
+    \bnfpn{capital identifier} \bnfsp
+    \bnfts{and} \bnfsp
+    \bnfpn{capital identifier}
+}\\
+\bnfprod{time}{
+    \bnfpn{float} \bnfsp
+    \bnfpn{time unit} \bnfsp
+}\\
+\bnfprod{time unit}{
+    \bnfts{d} \bnfor
+    \bnfts{h} \bnfor
+    \bnfts{min} \bnfor
+    \bnfts{s} \bnfor
+    \bnfts{ms} \bnfor
+    \bnfts{us}
+}
+\end{bnf*}
+
+\subsection{Details for expressions and constraints}
+% TODO add short description
+\begin{bnf*}
+\bnfprod{expression}{
+    \bnfpn{parenthesization} \bnfor
+    \bnfpn{operation} \bnfor
+	\bnfpn{atom}
+}\\
+\bnfprod{parenthesization}{
+	\bnfts{(} \bnfsp
+    \bnfpn{expression} \bnfsp
+    \bnfts{)}
+}\\
+\bnfprod{operation}{
+    \bnfpn{binary operation} \bnfor
+    \bnfpn{unary operation}
+}\\
+\bnfprod{binary operation}{
+    \bnfpn{expression} \bnfsp
+    \bnfpn{binary operator} \bnfsp
+    \bnfpn{expression}
+}\\
+\bnfprod{unary operation}{
+    \bnfpn{unary operator} \bnfsp
+    \bnfpn{expression}
+}\\
+\bnfprod{binary operator}{
+    \bnftd{Common algebraic and comparison operators}
+}\\
+\bnfprod{unary operator}{
+    \bnftd{Common unary operators}
+}\\
+\bnfprod{atom}{
+    \bnfpn{identifier} \bnfor
+    \bnfpn{parameter} \bnfor
+    \bnfpn{immediate}
+}\\
+\bnfprod{identifier}{
+	\bnfpn{qualifier} \bnfsp
+    \bnfpn{lower identifier}
+}\\
+\bnfprod{qualifier}{
+    \bnfpn{capital identifier} \bnfsp
+    \bnfts{.} \bnfor
+    \bnfes
+}\\
+\bnfprod{parameter}{
+    \bnfts{\$} \bnfsp
+    \bnfpn{lower identifier}
+}\\
+\bnfprod{immediate}{
+    \bnftd{An immediate value, like a digit}
+}
+\end{bnf*}
+
+\subsection{Basic types}
+% TODO add short description
+\begin{bnf*}
+\bnfprod{capital identifier}{
+    \bnftd{An identifier starting with an uppercase letter}
+}\\
+\bnfprod{lower identifier}{
+    \bnftd{An identifier starting with a lowercase letter}
+}\\
+\bnfprod{capital identifiers}{
+    \bnfts{,} \bnfsp
+    \bnfpn{capital identifier} \bnfsp
+    \bnfpn{capital identifiers} \bnfor
+    \bnfes
+}\\
+\bnfprod{lower identifiers}{
+    \bnfts{,} \bnfsp
+    \bnfpn{lower identifier} \bnfsp
+    \bnfpn{lower identifiers} \bnfor
+    \bnfes
+}\\
+\bnfprod{float}{
+    \bnfpn{digits} \bnfsp
+    \bnfts{.} \bnfsp
+    \bnfpn{digits}
+}\\
+\bnfprod{digits}{
+    \bnfpn{digit} \bnfsp
+    \bnfpn{digits} \bnfor
+    \bnfes
+}\\
+\bnfprod{digit}{
+    \bnftd{A single digit [0-9]}
+}
+\end{bnf*}
+
 
 % \begin{align*}
 % define &\quad CE(Att_1,\ ...\ Att_n) \\
