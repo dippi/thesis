@@ -2,7 +2,7 @@
 
 % TODO rationale on languages needs and choices
 
-\section{Tesla BNF Grammar}
+\section{Tesla BNF Grammar - Original}
 % TODO add short intro
 
 \subsection{Rule basic structure}
@@ -82,8 +82,7 @@
 }\\
 \bnfprod{predicate}{
     \bnfpn{event} \bnfor
-    \bnfpn{aggregate} \bnfor
-    \bnfpn{static}
+    \bnfpn{aggregate}
 }
 \end{bnf*}
 
@@ -165,6 +164,7 @@
     \bnfpn{aggregator} \bnfsp
     \bnfts{(} \bnfsp
     \bnfpn{constrained tuple} \bnfsp
+    \bnfpn{attribute selection} \bnfsp
     \bnfpn{timing} \bnfsp
     \bnfts{)}
 }\\
@@ -176,41 +176,14 @@
     \bnfts{COUNT}
     % TODO maybe add EXISTS/ANY and NOT
 }\\
+\bnfprod{attribute selection}{
+    \bnfts{.} \bnfsp
+    \bnfpn{lower identifier} \bnfor
+    \bnfes
+}\\
 \bnfprod{aggregate constraint}{
     \bnfpn{binary operator} \bnfsp
     \bnfpn{expression}
-}
-\end{bnf*}
-
-\subsection{Details for static}
-% TODO add short description
-\begin{bnf*}
-\bnfprod{static}{
-    \bnfpn{unordered static} \bnfor
-    \bnfpn{ordered static}
-}\\
-\bnfprod{unordered static}{
-    \bnfpn{unordered selection} \bnfsp
-    \bnfpn{predicate body}
-}\\
-\bnfprod{unordered selection}{
-    \bnfts{each} \bnfor
-    \bnfts{any} \bnfor % TODO maybe move in aggregates
-    \bnfts{not} % TODO maybe move in aggregates
-}\\
-\bnfprod{ordered static}{
-    \bnfpn{ordered selection} \bnfsp
-    \bnfpn{predicate body} \bnfsp
-    \bnfpn{order}
-}\\
-\bnfprod{ordered selection}{
-    \bnfts{first} \bnfor
-    \bnfts{last}
-}\\
-\bnfprod{order}{
-    \bnfts{ordered by} \bnfsp
-    \bnfpn{lower identifier} \bnfsp
-    \bnfpn{lower identifiers}
 }
 \end{bnf*}
 
@@ -292,13 +265,6 @@
     \bnfpn{capital identifier} \bnfsp
     \bnfts{.} \bnfor
     \bnfes
-}\\
-\bnfprod{parameter}{
-    \bnfts{\$} \bnfsp
-    \bnfpn{lower identifier}
-}\\
-\bnfprod{immediate}{
-    \bnftd{An immediate value, like a digit}
 }
 \end{bnf*}
 
@@ -310,6 +276,10 @@
 }\\
 \bnfprod{lower identifier}{
     \bnftd{An identifier starting with a lowercase letter}
+}\\
+\bnfprod{parameter}{
+    \bnfts{\$} \bnfsp
+    \bnfpn{lower identifier}
 }\\
 \bnfprod{capital identifiers}{
     \bnfts{,} \bnfsp
@@ -323,21 +293,15 @@
     \bnfpn{lower identifiers} \bnfor
     \bnfes
 }\\
+\bnfprod{immediate}{
+    \bnftd{An immediate value, like a digit}
+}\\
 \bnfprod{float}{
-    \bnfpn{digits} \bnfsp
-    \bnfts{.} \bnfsp
-    \bnfpn{digits}
-}\\
-\bnfprod{digits}{
-    \bnfpn{digit} \bnfsp
-    \bnfpn{digits} \bnfor
-    \bnfes
-}\\
-\bnfprod{digit}{
-    \bnftd{A single digit [0-9]}
+    \bnftd{A floating point number}
 }
 \end{bnf*}
 
+\newpage
 % ===== NEW SYNTAX =====
 
 % TODO explain what was ambiguous and all the choices made
@@ -416,7 +380,7 @@
     \bnfts{emit} \bnfsp
     \bnfpn{capital identifier} \bnfsp
     \bnfts{(} \bnfsp
-    \bnfpn{assignments} \bnfsp
+    \bnfpn{evaluations} \bnfsp
     \bnfts{)}
 }\\
 \bnfprod{consuming}{
@@ -424,30 +388,6 @@
     \bnfpn{capital identifier} \bnfsp
     \bnfpn{capital identifiers} \bnfor
     \bnfes
-}
-\end{bnf*}
-
-\subsection{Details for emit}
-% TODO add short description
-\begin{bnf*}
-\bnfprod{assignments}{
-    \bnfpn{assignment} \bnfsp
-    \bnfpn{assignments tail} \bnfor
-    \bnfes
-}\\
-\bnfprod{assignments tail}{
-    \bnfts{,} \bnfsp
-    \bnfpn{assignment} \bnfsp
-    \bnfpn{assignments tail} \bnfor
-    \bnfes
-}\\
-\bnfprod{assignments}{
-    \bnfpn{lower identifier} \bnfsp
-    \bnfts{=} \bnfsp
-    \bnfpn{assignment expression}
-}\\
-\bnfprod{assignment expression}{
-	% TODO define ...
 }
 \end{bnf*}
 
@@ -470,17 +410,34 @@
 \subsection{Details for where}
 % TODO add short description
 \begin{bnf*}
-\bnfprod{assignments}{
-    \bnfpn{assignment} \bnfsp
-    \bnfpn{assignments tail}
-}\\
-\bnfprod{assignments tail}{
-    \bnfts{,} \bnfsp
-    \bnfpn{assignment} \bnfsp
-    \bnfpn{assignments tail} \bnfor
+\bnfprod{filters}{
+    \bnfpn{expression} \bnfsp
+    \bnfpn{filters tail} \bnfor
     \bnfes
 }\\
-\bnfprod{assignment}{
+\bnfprod{filters tail}{
+    \bnfts{and} \bnfsp
+    \bnfpn{expression} \bnfsp
+    \bnfpn{filters tail} \bnfor
+    \bnfes
+}
+\end{bnf*}
+
+\subsection{Details for emit}
+% TODO add short description
+\begin{bnf*}
+\bnfprod{evaluations}{
+    \bnfpn{evaluation} \bnfsp
+    \bnfpn{evaluations tail} \bnfor
+    \bnfes
+}\\
+\bnfprod{evaluations tail}{
+    \bnfts{,} \bnfsp
+    \bnfpn{evaluation} \bnfsp
+    \bnfpn{evaluations tail} \bnfor
+    \bnfes
+}\\
+\bnfprod{evaluation}{
     \bnfpn{lower identifier} \bnfsp
     \bnfts{=} \bnfsp
     \bnfpn{expression}
@@ -491,14 +448,31 @@
 % TODO add short description
 \begin{bnf*}
 \bnfprod{predicate body}{
-    \bnfpn{constrained tuple} \bnfsp
-    \bnfpn{alias}
-}\\
-\bnfprod{constrained tuple}{
+	% TODO forbid param assignment in combination with 'not' 
     \bnfpn{capital identifier} \bnfsp
+    \bnfts{[} \bnfsp
+    \bnfpn{assignments} \bnfsp
+    \bnfts{]} \bnfsp
     \bnfts{(} \bnfsp
     \bnfpn{constraints} \bnfsp
-    \bnfts{)}
+    \bnfts{)} \bnfsp
+    \bnfpn{alias}
+}\\
+\bnfprod{assignments}{
+    \bnfpn{assignment} \bnfsp
+    \bnfpn{assignments tail} \bnfor
+    \bnfes
+}\\
+\bnfprod{assignments tail}{
+    \bnfts{,} \bnfsp
+    \bnfpn{assignment} \bnfsp
+    \bnfpn{assignments tail} \bnfor
+    \bnfes
+}\\
+\bnfprod{assignment}{
+    \bnfpn{parameter} \bnfsp
+    \bnfts{=} \bnfsp
+    \bnfpn{expression}
 }\\
 \bnfprod{constraints}{
     \bnfpn{expression} \bnfsp
@@ -506,7 +480,7 @@
     \bnfes
 }\\
 \bnfprod{constraints tail}{
-    \bnfts{,} \bnfsp % Different from original papers!
+    \bnfts{,} \bnfsp
     \bnfpn{expression} \bnfsp
     \bnfpn{constraints tail} \bnfor
     \bnfes
@@ -538,8 +512,13 @@
 % TODO add short description
 \begin{bnf*}
 \bnfprod{aggregate}{
-    \bnfpn{aggregate body} \bnfsp
-    \bnfpn{aggregate constraint}
+	\bnfpn{aggregate assignment} \bnfsp
+    \bnfpn{aggregate body}
+}\\
+\bnfprod{aggregate assignment}{
+    \bnfpn{parameter} \bnfsp
+    \bnfts{=} \bnfor
+    \bnfes
 }\\
 \bnfprod{aggregate body}{
     \bnfpn{aggregator} \bnfsp
@@ -556,9 +535,17 @@
     \bnfts{COUNT}
     % TODO maybe add EXISTS/ANY and NOT
 }\\
-\bnfprod{aggregate constraint}{
-    \bnfpn{binary operator} \bnfsp
-    \bnfpn{expression}
+\bnfprod{constrained tuple}{
+	\bnfpn{capital identifier} \bnfsp
+    \bnfts{(} \bnfsp
+    \bnfpn{constraints} \bnfsp
+    \bnfts{)} \bnfsp
+    \bnfpn{attribute selection}
+}\\
+\bnfprod{attribute selection}{
+    \bnfts{.} \bnfsp
+    \bnfpn{lower identifier} \bnfor
+    \bnfes
 }
 \end{bnf*}
 
@@ -575,22 +562,34 @@
 }\\
 \bnfprod{unordered selection}{
     \bnfts{each} \bnfor
-    \bnfts{any} \bnfor % TODO maybe move in aggregates
     \bnfts{not} % TODO maybe move in aggregates
 }\\
 \bnfprod{ordered static}{
     \bnfpn{ordered selection} \bnfsp
     \bnfpn{predicate body} \bnfsp
-    \bnfpn{order}
+    \bnfpn{ordered by}
 }\\
 \bnfprod{ordered selection}{
     \bnfts{first} \bnfor
     \bnfts{last}
 }\\
-\bnfprod{order}{
+\bnfprod{ordered by}{
     \bnfts{ordered by} \bnfsp
+    \bnfpn{ordering} \bnfsp
+    \bnfpn{orderings}
+}\\
+\bnfprod{ordering}{
     \bnfpn{lower identifier} \bnfsp
-    \bnfpn{lower identifiers}
+    \bnfpn{order}
+}\\
+\bnfprod{orderings}{
+    \bnfts{,} \bnfsp
+    \bnfpn{ordering} \bnfsp
+    \bnfpn{orderings}
+}\\
+\bnfprod{order}{
+    \bnfts{asc} \bnfor
+    \bnfts{desc}
 }
 \end{bnf*}
 
@@ -664,6 +663,7 @@
     \bnfpn{parameter} \bnfor
     \bnfpn{immediate}
 }\\
+% TODO differentiate between different contexts
 \bnfprod{identifier}{
 	\bnfpn{qualifier} \bnfsp
     \bnfpn{lower identifier}
@@ -672,13 +672,6 @@
     \bnfpn{capital identifier} \bnfsp
     \bnfts{.} \bnfor
     \bnfes
-}\\
-\bnfprod{parameter}{
-    \bnfts{\$} \bnfsp
-    \bnfpn{lower identifier}
-}\\
-\bnfprod{immediate}{
-    \bnftd{An immediate value, like a digit}
 }
 \end{bnf*}
 
@@ -690,6 +683,10 @@
 }\\
 \bnfprod{lower identifier}{
     \bnftd{An identifier starting with a lowercase letter}
+}\\
+\bnfprod{parameter}{
+    \bnfts{\$} \bnfsp
+    \bnfpn{lower identifier}
 }\\
 \bnfprod{capital identifiers}{
     \bnfts{,} \bnfsp
@@ -703,22 +700,15 @@
     \bnfpn{lower identifiers} \bnfor
     \bnfes
 }\\
+\bnfprod{immediate}{
+    \bnftd{An immediate value, like a digit}
+}\\
 \bnfprod{float}{
-    \bnfpn{digits} \bnfsp
-    \bnfts{.} \bnfsp
-    \bnfpn{digits}
-}\\
-\bnfprod{digits}{
-    \bnfpn{digit} \bnfsp
-    \bnfpn{digits} \bnfor
-    \bnfes
-}\\
-\bnfprod{digit}{
-    \bnftd{A single digit [0-9]}
+    \bnftd{A floating point number}
 }
 \end{bnf*}
 
-
+\newpage
 % \begin{align*}
 % define &\quad CE(Att_1,\ ...\ Att_n) \\
 % from   &\quad SE(Att_x\ op\ Val_x)\ and \\
