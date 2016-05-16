@@ -11,6 +11,7 @@
 ]{scrbook}
 
 \usepackage{lipsum}
+\usepackage{listings}
 \usepackage[linedheaders,parts,pdfspacing]{classicthesis}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -18,35 +19,38 @@
 \usepackage{acronym}
 \usepackage[epsilon,tstt]{backnaur}
 
-\title{Thesis Title}
+\title{Static Data in CEP}
 \author{Angelo Di Pilla}
 
-\includeonly{Chapters/language, Chapters/sql}
+%\includeonly{Chapters/tesla, Chapters/language, Chapters/sql}
 
 \begin{document}
 
 \maketitle
 
-\include{FrontBackMatter/abstract}
-\include{FrontBackMatter/dedication}
-\include{FrontBackMatter/acknowledgements}
-\include{FrontBackMatter/declaration}
-\include{FrontBackMatter/contents}
-
-% \part{First Part of My Thesis}
-
 % TODO Riassunto in italiano
 
-% TODO Intro
+% \include{FrontBackMatter/abstract}
+% \include{FrontBackMatter/dedication}
+% \include{FrontBackMatter/acknowledgements}
+% \include{FrontBackMatter/declaration}
+% \include{FrontBackMatter/contents}
 
-% TODO CEP and state of the art
-% TODO TESLA and TREX and previous work
+% Intro
+\include{Chapters/intro}
+
+% TODO CEP and state of the art (?)
+
+% TESLA and TREX and previous work
+\include{Chapters/tesla}
+
 % TODO Persistent data and challenges
 
 % Language needs, syntax and semantic
 \include{Chapters/language}
 
-% TODO Abstract architecture (Drivers)
+% Abstract architecture (Drivers)
+\include{Chapters/architecture}
 
 % First implementation SQL (w/ SQLite & C++)
 \include{Chapters/sql}
@@ -63,7 +67,5 @@
 % TODO Future development
 
 % TODO Conclusions
-
-\include{Chapters/placeholder}
 
 \end{document}

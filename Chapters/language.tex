@@ -2,311 +2,7 @@
 
 % TODO rationale on languages needs and choices
 
-\section{Tesla BNF Grammar - Original}
-% TODO add short intro
-
-\subsection{Rule basic structure}
-% TODO add short description
-\begin{bnf*}
-\bnfprod{rule}{
-    \bnfpn{define} \bnfsp
-    \bnfpn{from} \bnfsp
-    \bnfpn{where} \bnfsp
-    \bnfpn{consuming}
-}
-\end{bnf*}
-
-\subsection{Outline of each section}
-% TODO add short description
-\begin{bnf*}
-\bnfprod{define}{
-    \bnfts{define} \bnfsp
-    \bnfpn{capital identifier} \bnfsp
-    \bnfts{(} \bnfsp
-    \bnfpn{attributes} \bnfsp
-    \bnfts{)}
-}\\
-\bnfprod{from}{
-    \bnfts{from} \bnfsp
-    \bnfpn{predicate body} \bnfsp
-    \bnfpn{predicates}
-}\\
-\bnfprod{where}{
-    \bnfts{where} \bnfsp
-    \bnfpn{assignments} \bnfor
-    \bnfes
-}\\
-\bnfprod{consuming}{
-    \bnfts{consuming} \bnfsp
-    \bnfpn{capital identifier} \bnfsp
-    \bnfpn{capital identifiers} \bnfor
-    \bnfes
-}
-\end{bnf*}
-
-\subsection{Details for define}
-% TODO add short description
-\begin{bnf*}
-\bnfprod{attributes}{
-    \bnfpn{attribute} \bnfsp
-    \bnfpn{attributes tail} \bnfor
-    \bnfes
-}\\
-\bnfprod{attributes tail}{
-    \bnfts{,} \bnfsp
-    \bnfpn{attribute} \bnfsp
-    \bnfpn{attributes tail} \bnfor
-    \bnfes
-}\\
-\bnfprod{attribute}{
-    \bnfpn{lower identifier} \bnfsp
-    \bnfts{:} \bnfsp
-    \bnfpn{attribute type}
-}\\
-\bnfprod{attribute type}{
-    \bnfts{int} \bnfor
-    \bnfts{float} \bnfor
-    \bnfts{bool} \bnfor
-    \bnfts{string}
-}
-\end{bnf*}
-
-\subsection{Details for from}
-% TODO add short description
-\begin{bnf*}
-\bnfprod{predicates}{
-    \bnfts{and} \bnfsp
-    \bnfpn{predicate} \bnfsp
-    \bnfpn{predicates} \bnfor
-    \bnfes
-}\\
-\bnfprod{predicate}{
-    \bnfpn{event} \bnfor
-    \bnfpn{aggregate}
-}
-\end{bnf*}
-
-\subsection{Details for where}
-% TODO add short description
-\begin{bnf*}
-\bnfprod{assignments}{
-    \bnfpn{assignment} \bnfsp
-    \bnfpn{assignments tail}
-}\\
-\bnfprod{assignments tail}{
-    \bnfts{,} \bnfsp
-    \bnfpn{assignment} \bnfsp
-    \bnfpn{assignments tail} \bnfor
-    \bnfes
-}\\
-\bnfprod{assignment}{
-    \bnfpn{lower identifier} \bnfsp
-    \bnfts{=} \bnfsp
-    \bnfpn{expression}
-}
-\end{bnf*}
-
-\subsection{Details for predicate body}
-% TODO add short description
-\begin{bnf*}
-\bnfprod{predicate body}{
-    \bnfpn{constrained tuple} \bnfsp
-    \bnfpn{alias}
-}\\
-\bnfprod{constrained tuple}{
-    \bnfpn{capital identifier} \bnfsp
-    \bnfts{(} \bnfsp
-    \bnfpn{constraints} \bnfsp
-    \bnfts{)}
-}\\
-\bnfprod{constraints}{
-    \bnfpn{expression} \bnfsp
-    \bnfpn{constraints tail} \bnfor
-    \bnfes
-}\\
-\bnfprod{constraints tail}{
-    \bnfts{,} \bnfsp % Different from original papers!
-    \bnfpn{expression} \bnfsp
-    \bnfpn{constraints tail} \bnfor
-    \bnfes
-}\\
-\bnfprod{alias}{
-    \bnfts{as} \bnfsp
-    \bnfpn{capital identifier} \bnfor
-    \bnfes
-}
-\end{bnf*}
-
-\subsection{Details for event}
-% TODO add short description
-\begin{bnf*}
-\bnfprod{event}{
-    \bnfpn{event selection} \bnfsp
-    \bnfpn{predicate body} \bnfsp
-    \bnfpn{timing}
-}\\
-\bnfprod{event selection}{
-    \bnfts{each} \bnfor
-    \bnfts{not} \bnfor % TODO maybe move in aggregates
-    \bnfts{first} \bnfor
-    \bnfts{last}
-}
-\end{bnf*}
-
-\subsection{Details for aggregates}
-% TODO add short description
-\begin{bnf*}
-\bnfprod{aggregate}{
-    \bnfpn{aggregate body} \bnfsp
-    \bnfpn{aggregate constraint}
-}\\
-\bnfprod{aggregate body}{
-    \bnfpn{aggregator} \bnfsp
-    \bnfts{(} \bnfsp
-    \bnfpn{constrained tuple} \bnfsp
-    \bnfpn{attribute selection} \bnfsp
-    \bnfpn{timing} \bnfsp
-    \bnfts{)}
-}\\
-\bnfprod{aggregator}{
-    \bnfts{AVG} \bnfor
-    \bnfts{SUM} \bnfor
-    \bnfts{MAX} \bnfor
-    \bnfts{MIN} \bnfor
-    \bnfts{COUNT}
-    % TODO maybe add EXISTS/ANY and NOT
-}\\
-\bnfprod{attribute selection}{
-    \bnfts{.} \bnfsp
-    \bnfpn{lower identifier} \bnfor
-    \bnfes
-}\\
-\bnfprod{aggregate constraint}{
-    \bnfpn{binary operator} \bnfsp
-    \bnfpn{expression}
-}
-\end{bnf*}
-
-\subsection{Details for timing}
-% TODO add short description
-\begin{bnf*}
-\bnfprod{timing}{
-    \bnfpn{within} \bnfor
-    \bnfpn{between}
-}\\
-\bnfprod{within}{
-    \bnfts{within} \bnfsp
-    \bnfpn{time} \bnfsp
-    \bnfts{from} \bnfsp
-    \bnfpn{capital identifier}
-}\\
-\bnfprod{between}{
-    \bnfts{between} \bnfsp
-    \bnfpn{capital identifier} \bnfsp
-    \bnfts{and} \bnfsp
-    \bnfpn{capital identifier}
-}\\
-\bnfprod{time}{
-    \bnfpn{float} \bnfsp
-    \bnfpn{time unit} \bnfsp
-}\\
-\bnfprod{time unit}{
-    \bnfts{d} \bnfor
-    \bnfts{h} \bnfor
-    \bnfts{min} \bnfor
-    \bnfts{s} \bnfor
-    \bnfts{ms} \bnfor
-    \bnfts{us}
-}
-\end{bnf*}
-
-\subsection{Details for expressions and constraints}
-% TODO add short description
-\begin{bnf*}
-\bnfprod{expression}{
-    \bnfpn{parenthesization} \bnfor
-    \bnfpn{operation} \bnfor
-	\bnfpn{atom}
-}\\
-\bnfprod{parenthesization}{
-	\bnfts{(} \bnfsp
-    \bnfpn{expression} \bnfsp
-    \bnfts{)}
-}\\
-\bnfprod{operation}{
-    \bnfpn{binary operation} \bnfor
-    \bnfpn{unary operation}
-}\\
-\bnfprod{binary operation}{
-    \bnfpn{expression} \bnfsp
-    \bnfpn{binary operator} \bnfsp
-    \bnfpn{expression}
-}\\
-\bnfprod{unary operation}{
-    \bnfpn{unary operator} \bnfsp
-    \bnfpn{expression}
-}\\
-\bnfprod{binary operator}{
-    \bnftd{Common algebraic and comparison operators}
-}\\
-\bnfprod{unary operator}{
-    \bnftd{Common unary operators}
-}\\
-\bnfprod{atom}{
-    \bnfpn{identifier} \bnfor
-    \bnfpn{parameter} \bnfor
-    \bnfpn{immediate}
-}\\
-\bnfprod{identifier}{
-	\bnfpn{qualifier} \bnfsp
-    \bnfpn{lower identifier}
-}\\
-\bnfprod{qualifier}{
-    \bnfpn{capital identifier} \bnfsp
-    \bnfts{.} \bnfor
-    \bnfes
-}
-\end{bnf*}
-
-\subsection{Basic types}
-% TODO add short description
-\begin{bnf*}
-\bnfprod{capital identifier}{
-    \bnftd{An identifier starting with an uppercase letter}
-}\\
-\bnfprod{lower identifier}{
-    \bnftd{An identifier starting with a lowercase letter}
-}\\
-\bnfprod{parameter}{
-    \bnfts{\$} \bnfsp
-    \bnfpn{lower identifier}
-}\\
-\bnfprod{capital identifiers}{
-    \bnfts{,} \bnfsp
-    \bnfpn{capital identifier} \bnfsp
-    \bnfpn{capital identifiers} \bnfor
-    \bnfes
-}\\
-\bnfprod{lower identifiers}{
-    \bnfts{,} \bnfsp
-    \bnfpn{lower identifier} \bnfsp
-    \bnfpn{lower identifiers} \bnfor
-    \bnfes
-}\\
-\bnfprod{immediate}{
-    \bnftd{An immediate value, like a digit}
-}\\
-\bnfprod{float}{
-    \bnftd{A floating point number}
-}
-\end{bnf*}
-
-\newpage
-% ===== NEW SYNTAX =====
-
-% TODO explain what was ambiguous and all the choices made
-
-\section{Tesla BNF Grammar - New}
+\section{Tesla BNF Grammar}
 % TODO add short intro
 
 \subsection{Event type declaration}
@@ -752,37 +448,37 @@ Similarly the function $attVal$ can be extended to return attributes of static t
 \subsection{Event composition}
 % TODO add a short description
 \begin{align*}% Example of each
-&define\ CE\ from\ SE\ and\ each\ SD\ \triangleq\\
+&from\ SE\ and\ each\ SD\ emit\ CE\ \triangleq\\
 &Occurs(CE, lab(r, \{l_0, l_1\})\ \leftrightarrow\\
 &(Occurs(SE, l_0)\ \wedge\ ThereIs(SD, l_1))
 \end{align*}
 
 \begin{align*}% Example of not
-&define\ CE\ from\ SE\ and\ not\ SD\ \triangleq\\
+&from\ SE\ and\ not\ SD\ emit\ CE\ \triangleq\\
 &Occurs(CE, lab(r, \{l_0\})\ \leftrightarrow\\
 &(Occurs(SE, l_0)\ \wedge\ \not \exists l_1 ThereIs(SD, l_1))
 \end{align*}
 
 \begin{align*}% Example of first
-&define\ CE\ from\ SE\ and\ first\ SD\ order\ by\ Att_1\triangleq\\
+&from\ SE\ and\ first\ SD\ order\ by\ Att_1\ emit\ CE\ \triangleq\\
 &Occurs(CE, lab(r, \{l_0, l_1\})\ \leftrightarrow\ (Occurs(SE, l_0)\ \wedge\ ThereIs(SD, l_1)\\
 &\wedge\ (\not \exists l_2\ (ThereIs(SD, l_2)\ \wedge\ (attVal(l_1, Att_1)\ <\ attVal(l_2, Att_1)))))
 \end{align*}
 
 \begin{align*}% Example of last
-&define\ CE\ from\ SE\ and\ last\ SD\ order\ by\ Att_1\triangleq\\
+&from\ SE\ and\ last\ SD\ order\ by\ Att_1\ emit\ CE\ \triangleq\\
 &Occurs(CE, lab(r, \{l_0, l_1\})\ \leftrightarrow\ (Occurs(SE, l_0)\ \wedge\ ThereIs(SD, l_1)\\
 &\wedge\ (\not \exists l_2\ (ThereIs(SD, l_2)\ \wedge\ (attVal(l_1, Att_1)\ >\ attVal(l_2, Att_1)))))
 \end{align*}
 
 \begin{align*}% Example of attribute constraint
-&define\ CE\ from\ SE\ and\ each\ SD(Att_1\ op \ Val_1)\ \triangleq\\
+&from\ SE\ and\ each\ SD(Att_1\ op \ Val_1)\ emit\ CE\ \triangleq\\
 &Occurs(CE, lab(r, \{l_0, l_1\})\ \leftrightarrow\ (Occurs(SE, l_0)\\
 &\wedge\ ThereIs(SD, l_1)\ \wedge\ (attVal(l_1, Att_1)\ op\ Val_1))
 \end{align*}
 
 \begin{align*}% Example of aggregates
-&define\ CE\ from\ SE\ and\ AGGR(SD.Att_1)\ op\ Y\ \triangleq\\
+&from\ SE\ and\ AGGR(SD.Att_1)\ op\ Y\ emit\ CE\ \triangleq\\
 &Occurs(CE, lab(r, \{l_0\})\ \leftrightarrow\ (Occurs(SE, l_0)\\
 &\wedge\ \forall Set\ (\forall x, \forall l \in L
 (x \in Set\ \leftrightarrow\ (ThereIs(SD, l)\\
@@ -790,7 +486,7 @@ Similarly the function $attVal$ can be extended to return attributes of static t
 \end{align*}
 
 \begin{align*}% Example of parameters
-&define\ CE\ from\ SE(Att_i\ = \ \$Par)\ and\ each\ SD(Att_j\ = \ \$Par)\ \triangleq\\
+&from\ SE(Att_i\ = \ \$Par)\ and\ each\ SD(Att_j\ = \ \$Par)\ emit\ CE\ \triangleq\\
 &Occurs(CE, lab(r, \{l_0, l_1\})\ \leftrightarrow\ (Occurs(SE, l_0)\\
 &\wedge\ ThereIs(SD, l_1)\ \wedge\ (attVal(l_0, Att_i)\ =\ attVal(l_1, Att_j)))
 \end{align*}
