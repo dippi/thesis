@@ -1,12 +1,24 @@
 \chapter{Tesla and TRex}
 
-% TODO Introduction on previous work
+\section{Introduction}
+
+Tesla \cite{tesla} is a declarative strongly typed CEP language that, as some other alternatives, provide a comprehensive set of common operation on events (like filtering and parameterization, composition and pattern detection, negation and aggregation) and allows to control selection policies, time windows and event consumption. However, while the competitors rely on informal documentation that leave room to ambiguities, Tesla's unprecedented characteristic is its aim to a complete semantic specification with TRIO \cite{trio}, a first order temporal logic. This choice improve the reasoning process and empower the model rather than the implementation; it is part of the purpose of the thesis to keep working on this track.
+% TODO maybe add a rule example to give an initial hint 
+
+Tesla reference implementation is TRex \cite{trex}, a CEP engine written in C++. It was initially demonstrated using an algorithm called automata-based incremental processing (AIP), which transform each rule in a state machine that is spawned and activated by every incoming event until successful pattern detection or failure; AIP was fundamental to analyze complexity bounds imposed by the language. Later it has been rewritten with column-based delayed processing (CDP) \cite{trex-cuda}, that works accumulating events and processing them in batch as soon a possible trigger is detected; this technique was found to be faster and easier to parallelize and offered the opportunity for a CUDA implementation.
+
+Strangely, while the specification of Tesla's semantic was a central topic of the very first paper, a the time of the writing the syntax was always described informally and through examples. That is a risk of possible misunderstandings in the very foundation of the project, so as first thing in this chapter I will try to define the grammar in a more rigorous and hopefully clear way. Then I will summarize the previous writings about semantic and finally will highlight the ambiguities that aroused after system analysis and team discussion, followed by the clarifications or modifications proposed.
 
 \section{Tesla BNF Grammar}
-% TODO add short intro
+
+Backus-Naur Form (BNF) is a notation for context-free grammars that allows to recursively define the composition of every single syntax feature. The components of this kind of writing are terminal symbols, that are simple strings possibly empty ($\epsilon$), and non terminal ones, that are wrapped in angle brackets. Each non terminal is defined in a derivation rule and on the right hand side there will be the non terminal name, while on the left one there will be a sequence of symbols possibly separated by a vertical line ($|$) to imply choice between options.
+
+BNF is also used, in a machine readable form, by parser generators like ANTLR (the one used by the project), so technically there is a definition already, but it had to go through some scarcely documented compromises to avoid parsing ambiguities and to face some practical need. The version presented here instead is meant for human comprehension and as a high level reference, so I will try make it as clear and self explanatory as possible, giving up the irrelevant details needed only for parsing purposes.
 
 \subsection{Rule basic structure}
-% TODO add short description
+
+The outline of a rule is characterized by four main sections: definition of the derivate event, pattern of events, attribute assignment and event consumption.
+
 \begin{bnf*}
 \bnfprod{rule}{
     \bnfpn{define} \bnfsp
@@ -16,8 +28,10 @@
 }
 \end{bnf*}
 
-\subsection{Outline of each section}
-% TODO add short description
+\subsection{Details for define}
+
+The definition of a complex event is characterized by the name of the soon to be generated tuple and by a list of attributes names and types.
+
 \begin{bnf*}
 \bnfprod{define}{
     \bnfts{define} \bnfsp
@@ -25,27 +39,8 @@
     \bnfts{(} \bnfsp
     \bnfpn{attributes} \bnfsp
     \bnfts{)}
-}\\
-\bnfprod{from}{
-    \bnfts{from} \bnfsp
-    \bnfpn{predicate body} \bnfsp
-    \bnfpn{predicates}
-}\\
-\bnfprod{where}{
-    \bnfts{where} \bnfsp
-    \bnfpn{assignments} \bnfor
-    \bnfes
-}\\
-\bnfprod{consuming}{
-    \bnfts{consuming} \bnfsp
-    \bnfpn{capital identifier} \bnfsp
-    \bnfpn{capital identifiers} \bnfor
-    \bnfes
 }
 \end{bnf*}
-
-\subsection{Details for define}
-% TODO add short description
 \begin{bnf*}
 \bnfprod{attributes}{
     \bnfpn{attribute} \bnfsp
@@ -72,7 +67,16 @@
 \end{bnf*}
 
 \subsection{Details for from}
-% TODO add short description
+
+From clause is the core of pattern detection and is made of a sequence of predicates on different events and aggregates.
+
+\begin{bnf*}
+\bnfprod{from}{
+    \bnfts{from} \bnfsp
+    \bnfpn{predicate body} \bnfsp
+    \bnfpn{predicates}
+}
+\end{bnf*}
 \begin{bnf*}
 \bnfprod{predicates}{
     \bnfts{and} \bnfsp
@@ -87,7 +91,16 @@
 \end{bnf*}
 
 \subsection{Details for where}
-% TODO add short description
+
+The where section is composed by a set of assignments of the attributes of the soon to be generated event using arbitrary expression over the data processed in the pattern detection phase.
+
+\begin{bnf*}
+\bnfprod{where}{
+    \bnfts{where} \bnfsp
+    \bnfpn{assignments} \bnfor
+    \bnfes
+}
+\end{bnf*}
 \begin{bnf*}
 \bnfprod{assignments}{
     \bnfpn{assignment} \bnfsp
@@ -106,8 +119,23 @@
 }
 \end{bnf*}
 
+\subsection{Details for consuming}
+
+Consumption policy is simply defined as a list of names of events, that took part in the from clause. 
+
+\begin{bnf*}
+\bnfprod{consuming}{
+    \bnfts{consuming} \bnfsp
+    \bnfpn{capital identifier} \bnfsp
+    \bnfpn{capital identifiers} \bnfor
+    \bnfes
+}
+\end{bnf*}
+
 \subsection{Details for predicate body}
-% TODO add short description
+
+The base of a predicate is made by a tuple constrained by a set of boolean expression over current event's data and parameters, possibly followed by an alias definition.
+
 \begin{bnf*}
 \bnfprod{predicate body}{
     \bnfpn{constrained tuple} \bnfsp
@@ -137,8 +165,12 @@
 }
 \end{bnf*}
 
+Note: in this formalization we use commas to separate constraint, opposed to $AND$ as in the original papers, to better distinguish predicates vs. filters composition.
+
 \subsection{Details for event}
-% TODO add short description
+
+An event predicate (except the trigger one that we can see in the $from$ clause) adds to tuple filtering a selection policy chosen between $each, not, first, last$ and constraints about the time window.
+
 \begin{bnf*}
 \bnfprod{event}{
     \bnfpn{event selection} \bnfsp
@@ -154,7 +186,9 @@
 \end{bnf*}
 
 \subsection{Details for aggregates}
-% TODO add short description
+
+Tesla has the common aggregators that can be found in DBMS and other CEP engines, but the list could be extended if needed. They are applied on a set of tuples filtered in a similar way to event predicates and the result can be used in an additional constraint for the event pattern.
+
 \begin{bnf*}
 \bnfprod{aggregate}{
     \bnfpn{aggregate body} \bnfsp
@@ -163,10 +197,13 @@
 \bnfprod{aggregate body}{
     \bnfpn{aggregator} \bnfsp
     \bnfts{(} \bnfsp
+    \bnfpn{aggregate inner} \bnfsp
+    \bnfts{)}
+}\\
+\bnfprod{aggregate inner}{
     \bnfpn{constrained tuple} \bnfsp
     \bnfpn{attribute selection} \bnfsp
     \bnfpn{timing} \bnfsp
-    \bnfts{)}
 }\\
 \bnfprod{aggregator}{
     \bnfts{AVG} \bnfor
@@ -188,7 +225,9 @@
 \end{bnf*}
 
 \subsection{Details for timing}
-% TODO add short description
+
+Time constraint is imposed with two different type of window: one of given duration from a starting event, the other delimited by a couple of distinct events.
+
 \begin{bnf*}
 \bnfprod{timing}{
     \bnfpn{within} \bnfor
@@ -221,7 +260,9 @@
 \end{bnf*}
 
 \subsection{Details for expressions and constraints}
-% TODO add short description
+
+Expressions in Tesla are common algebraic, boolean and string operations composed with each other and they can operate on immediate values, references to current tuple attributes or parameters.
+
 \begin{bnf*}
 \bnfprod{expression}{
     \bnfpn{parenthesization} \bnfor
@@ -269,7 +310,9 @@
 \end{bnf*}
 
 \subsection{Basic types}
-% TODO add short description
+
+These basic symbols help defining the rest of the BNF. We can notice the three types of identifiers: $capital$ used for event names, $lower$ used for tuple attributes and $parameter$ obviously used for parameterization.
+
 \begin{bnf*}
 \bnfprod{capital identifier}{
     \bnftd{An identifier starting with an uppercase letter}
