@@ -346,27 +346,30 @@ These basic symbols help defining the rest of the BNF. We can notice the three t
 
 \section{Semantic}
 % TODO summary of semantic as from the previous papers
+[...]
 
 \section{Ambiguities and clarifications}
 
 During the analysis of the previously defined syntax, it appeared that there were some ambiguities and that, besides the additions of static data, a renewal of the whole language was appropriate.
 
 \subsection{Parameters}
-There is no explicit definition of the expressivity of parameterisation, meaning that it isn't clear if parameters are used in some kind of prolog like logical evaluation or they need two separate phases of assignment and usage.\\
-The operating principle is indeed based on the latter option and few more issues follow from that consideration: it isn't stated that the order of definition and usage is relevant, there is no difference between assignment and comparison operators and parameters definition is mixed with selection predicates, without any syntax distinction of sort.\\
-We need the new syntax to make all more clear and intuitive, reordering clauses and separating parameters definitions.
+In previous papers parameterization is presented only through examples and there is no explicit definition of its expressivity. So it isn't clear if parameters are used in some kind of prolog-like logical evaluation or they need two separate phases of assignment and usage.\\
+The latter option appear to be the intended one and few more issues follow from that consideration, for example it isn't stated if the order of definition and usage is relevant or binding, there is no difference between assignment and comparison operators and parameters definition is mixed with selection predicates, without any syntax distinction.\\
+We need the new syntax to make everything more clear and intuitive by reordering clauses and separating parameters definitions.
 
 \subsection{Event declaration}
-Simple events aren't declared beforehand and just appear as input of the system at runtime, that means no way of type checking them in advance against rules.\\
-Complex event can be defined with different rules and possibly with different signatures, again breaking the desired type safety.\\
-Impossibility of assigning a numerical id to an event type for more convenient interaction with external systems.\\
-A separate declaration statement is necessary.
+Tesla is presented as a strongly typed language and so should be able to protect the system from some incoherences before the actual rule evaluation, but type informations are incomplete and rules can't be checked in advance. Simple events aren't declared beforehand and just appear at runtime as input to the system. Complex event can be emitted by different rules and possibly with different signatures.\\
+More over it's impossible to assign a numerical id to an event type for more convenient interaction with external systems.\\
+Some of these issues have tackled informally in the implementation, but the solution adopted look more like an unavoidable patch rather than a design choice. To fill those gaps we propose a new independent statement to declare the signature and the id of any event that is going to be processed by the system.
 
 \subsection{Filtering}
-Using the word $WHERE$ for the attributes assignment clause is ambiguous, since it wrongly reminds the $SQL$ $WHERE$ clause for filtering.\\
-While the actual filtering is currently made in the $FROM$ clause, mixed with the selection predicates.\\
-The idea is to change the naming and better separate selection and filtering.
+The use of the word $WHERE$ for attributes assignment can be counterintuitive, since it wrongly reminds of the $SQL$  clause for rows filtering.\\
+Moreover filtering is currently made in the $FROM$ clause, mixed with the selection predicates, in a way that can easily became messy.\\
+The new language should improve keywords choice to facilitate the approach of newcomers and it should better separate selection and filtering to keep statements as clean as possible.
 
 \subsection{Timestamp and selection}
-% TODO I'm not convinced about that, we should talk
-It is not clear if timing ranges are inclusive or exclusive, while the current implementation includes the closest and excludes the furthest instant.
+During event composition, inclusion or exclusion of a single time instant can make a great difference, but yet it isn't clear if timing intervals should be considered open or closed.\\
+In the latter case it would be possible to create paradoxes of events that should be generated if they are not and should be generated if they are, like $define\ A\ from\ B\ and\ not\ A\ within\ X\ from\ B$; at the same time it would be impossible to write a rule like $from\ A\ as\ A1\ and\ not\ A\ within\ X\ from\ A1$ that sounds reasonable at first look, but it wouldn't emit any event.\\
+However the former case it wouldn't allow hierarchical and recursive composition, that are needed to modularize when rule complexity increases and to have enough expressivity power to express iteration.
+The current implementation, that includes the closest instant and exclude the furthest one, solves the any issue introducing a runtime nondeterminism: it evaluate conditions in execution order and never look back, so different processing order of logically concurrent events could lead to different outcomes.
+Since we haven't found a better approach, the procedure will remain the same, but the topic should be discussed again and the users should be aware of the limitations.
