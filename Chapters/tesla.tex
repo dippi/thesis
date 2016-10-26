@@ -1,15 +1,15 @@
-\chapter{Tesla and TRex}
+\chapter{TESLA and TRex}
 
 \section{Introduction}
 
-Tesla \cite{tesla} is a declarative strongly typed CEP language that, as some other alternatives, provide a comprehensive set of common operation on events (like filtering and parameterization, composition and pattern detection, negation and aggregation) and allows to control selection policies, time windows and event consumption. However, while the competitors rely on informal documentation that leave room to ambiguities, Tesla's unprecedented characteristic is its aim to a complete semantic specification with TRIO \cite{trio}, a first order temporal logic. This choice improve the reasoning process and empower the model rather than the implementation; it is part of the purpose of the thesis to keep working on this track.
+TESLA \cite{tesla} is a declarative strongly typed CEP language that, as some other alternatives, provides a comprehensive set of common operation on events (like filtering and parameterization, composition and pattern detection, negation and aggregation) and allows to control selection policies, time windows and event consumption. However, while the competitors rely on informal documentation that leaves room to ambiguities, TESLA's unprecedented characteristic is its aim to a complete semantic specification with TRIO \cite{trio}, a first order temporal logic. The definition in advance of a precise behavior for each feature improves coherence in the development of engines based on TESLA and helps users to understand the language deeply with less empirical research. It is part of the purpose of the thesis to keep working on this track.
 % TODO maybe add a rule example to give an initial hint 
 
-Tesla reference implementation is TRex \cite{trex}, a CEP engine written in C++. It was initially demonstrated using an algorithm called automata-based incremental processing (AIP), which transform each rule in a state machine that is spawned and activated by every incoming event until successful pattern detection or failure; AIP was fundamental to analyze complexity bounds imposed by the language. Later it has been rewritten with column-based delayed processing (CDP) \cite{trex-cuda}, that works accumulating events and processing them in batch as soon a possible trigger is detected; this technique was found to be faster and easier to parallelize and offered the opportunity for a CUDA implementation.
+TESLA reference implementation is TRex \cite{trex}, a CEP engine written in C++. It was initially designed around an algorithm called automata-based incremental processing (AIP), which transforms each rule in a state machine that is spawned and activated by every incoming event until successful pattern detection or failure; AIP was fundamental to analyze the complexity bounds imposed by the language. Later TRex has been rewritten using a different algorithm called column-based delayed processing (CDP) \cite{trex-cuda}, that works accumulating events and processing them in batch as soon as a possible trigger is detected; this technique was found to be faster and easier to parallelize and offered the opportunity for a CUDA implementation.
 
-Strangely, while the specification of Tesla's semantic was a central topic of the very first paper, a the time of the writing the syntax was always described informally and through examples. That is a risk of possible misunderstandings in the very foundation of the project, so as first thing in this chapter I will try to define the grammar in a more rigorous and hopefully clear way. Then I will summarize the previous writings about semantic and finally will highlight the ambiguities that aroused after system analysis and team discussion, followed by the clarifications or modifications proposed.
+While the specification of TESLA's semantic was a central topic of the very first paper, at the time of the writing the syntax was always described informally and through examples. This was identified as a risk of possible misunderstandings in the very foundation of the project, so as first thing in this chapter I will try to define the TESLA grammar in a more rigorous and hopefully clear way. Then I will summarize the previous writings about semantic and finally will highlight the inconsistencies between the semantics of TESLA and its actual implementation in the TRex engine, which aroused after system analysis and team discussion, followed by the clarifications or modifications proposed.
 
-\section{Tesla BNF Grammar}
+\section{TESLA BNF Grammar}
 
 Backus-Naur Form (BNF) is a notation for context-free grammars that allows to recursively define the composition of every single syntax feature. The components of this kind of writing are terminal symbols, that are simple strings possibly empty ($\epsilon$), and non terminal ones, that are wrapped in angle brackets. Each non terminal is defined in a derivation rule and on the right hand side there will be the non terminal name, while on the left one there will be a sequence of symbols possibly separated by a vertical line ($|$) to imply choice between options.
 
@@ -187,7 +187,7 @@ An event predicate (except the trigger one that we can see in the $from$ clause)
 
 \subsection{Details for aggregates}
 
-Tesla has the common aggregators that can be found in DBMS and other CEP engines, but the list could be extended if needed. They are applied on a set of tuples filtered in a similar way to event predicates and the result can be used in an additional constraint for the event pattern.
+TESLA has the common aggregators that can be found in DBMS and other CEP engines, but the list could be extended if needed. They are applied on a set of tuples filtered in a similar way to event predicates and the result can be used in an additional constraint for the event pattern.
 
 \begin{bnf*}
 \bnfprod{aggregate}{
@@ -261,7 +261,7 @@ Time constraint is imposed with two different type of window: one of given durat
 
 \subsection{Details for expressions and constraints}
 
-Expressions in Tesla are common algebraic, boolean and string operations composed with each other and they can operate on immediate values, references to current tuple attributes or parameters.
+Expressions in TESLA are common algebraic, boolean and string operations composed with each other and they can operate on immediate values, references to current tuple attributes or parameters.
 
 \begin{bnf*}
 \bnfprod{expression}{
@@ -350,26 +350,34 @@ These basic symbols help defining the rest of the BNF. We can notice the three t
 
 \section{Ambiguities and clarifications}
 
-During the analysis of the previously defined syntax, it appeared that there were some ambiguities and that, besides the additions of static data, a renewal of the whole language was appropriate.
+During the analysis of the previously defined syntax, it appeared clear the presence some ambiguities in the semantics of some specific TESLA rules and that, besides the additions of static data, a renewal of the whole language was appropriate.
 
 \subsection{Parameters}
-In previous papers parameterization is presented only through examples and there is no explicit definition of its expressivity. So it isn't clear if parameters are used in some kind of prolog-like logical evaluation or they need two separate phases of assignment and usage.\\
-The latter option appear to be the intended one and few more issues follow from that consideration, for example it isn't stated if the order of definition and usage is relevant or binding, there is no difference between assignment and comparison operators and parameters definition is mixed with selection predicates, without any syntax distinction.\\
-We need the new syntax to make everything more clear and intuitive by reordering clauses and separating parameters definitions.
+In previous papers parameterization was presented only through examples and there was no explicit definition of its expressivity. So it wasn't clear if parameters needed two separate phases of assignment and usage or they could appear as free variables in high level logical constraints.\\
+The former option appeared to be the intended one and few more issues followed from that consideration, for example it wasn't stated if the order of definition and usage was relevant, there was no difference between assignment and comparison operators and parameters definition was mixed with selection predicates, without any syntax distinction.\\
+We need the syntax to make everything more clear and intuitive by reordering clauses and separating parameters definitions.
 
 \subsection{Event declaration}
-Tesla is presented as a strongly typed language and so should be able to protect the system from some incoherences before the actual rule evaluation, but type informations are incomplete and rules can't be checked in advance. Simple events aren't declared beforehand and just appear at runtime as input to the system. Complex event can be emitted by different rules and possibly with different signatures.\\
-More over it's impossible to assign a numerical id to an event type for more convenient interaction with external systems.\\
-Some of these issues have tackled informally in the implementation, but the solution adopted look more like an unavoidable patch rather than a design choice. To fill those gaps we propose a new independent statement to declare the signature and the id of any event that is going to be processed by the system.
+TESLA was presented as a strongly typed language and so it was expected to prevent type incoherences before the actual rule evaluation. However simple events weren't declared beforehand and just appeared at runtime as input to the system, while complex event could be emitted by different rules possibly with different signatures. That lack of information made hard to check in advance.\\
+More over it was impossible to assign a numerical id to an event type for more convenient interaction with external systems.\\
+Some of these issues have been tackled informally in the implementation, but the solution adopted looked more like an unavoidable patch rather than a design choice. To fill those gaps we propose a new independent statement to declare the signature and the id of any event that is going to be processed by the system.
 
 \subsection{Filtering}
 The use of the word $WHERE$ for attributes assignment can be counterintuitive, since it wrongly reminds of the $SQL$  clause for rows filtering.\\
-Moreover filtering is currently made in the $FROM$ clause, mixed with the selection predicates, in a way that can easily became messy.\\
-The new language should improve keywords choice to facilitate the approach of newcomers and it should better separate selection and filtering to keep statements as clean as possible.
+Moreover filtering was made in the $FROM$ clause, mixed with the selection predicates, in a way that could easily became messy.\\
+The language revision should improve keywords choice to facilitate the approach of newcomers and it should better separate selection and filtering to keep statements as clean as possible.
 
 \subsection{Timestamp and selection}
-During event composition, inclusion or exclusion of a single time instant can make a great difference, but yet it isn't clear if timing intervals should be considered open or closed.\\
-In the latter case it would be possible to create paradoxes of events that should be generated if they are not and should be generated if they are, like $define\ A\ from\ B\ and\ not\ A\ within\ X\ from\ B$; at the same time it would be impossible to write a rule like $from\ A\ as\ A1\ and\ not\ A\ within\ X\ from\ A1$ that sounds reasonable at first look, but it wouldn't emit any event.\\
-However the former case it wouldn't allow hierarchical and recursive composition, that are needed to modularize when rule complexity increases and to have enough expressivity power to express iteration.
-The current implementation, that includes the closest instant and exclude the furthest one, solves the any issue introducing a runtime nondeterminism: it evaluate conditions in execution order and never look back, so different processing order of logically concurrent events could lead to different outcomes.
-Since we haven't found a better approach, the procedure will remain the same, but the topic should be discussed again and the users should be aware of the limitations.
+During event composition, inclusion or exclusion of the present time instant can make a great difference, but the topic wasn't clearly discussed in previous papers.\\
+The exclusion of the present instant wouldn't allow hierarchical and recursive composition, which are needed to modularize rules when complexity increases and to have enough expressivity power to describe iterations.\\
+However the choice of closed ranges, which provide that kind of expressivity, would bring some downsides too. For example it would be possible to create paradoxes with events that should be generated if they are not and shouldn't be generated if they are, like:
+\begin{align*}
+define\ A\ from\ B\ and\ not\ A\ within\ X\ from\ B
+\end{align*}
+At the same time it would be impossible to write a rule like:
+\begin{align*}
+define\ B\ from\ A\ as\ A1\ and\ not\ A\ within\ X\ from\ A1
+\end{align*}
+that sounds reasonable at a first look, but it wouldn't emit any event.\\
+A practical solution is the one used by the reference implementation, that includes the closest instant and breaks paradoxes introducing an implicit total ordering: it evaluates conditions in execution order and never looks back. The only price paid is a runtime nondeterminism, which means that different processing order of logically concurrent events could lead to different outcomes.\\
+This approach is the most reasonable found so far and should be considered the standard, but the topic should remain open to further discussion.\\
