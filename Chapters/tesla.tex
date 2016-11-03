@@ -401,8 +401,9 @@ To assign values to $CE$ attributes we use the $where$ clause and each TESLA exp
 &att_n = expr_n(SE.att_1,\ ...,\ SE.att_m)\ \triangleq
 \end{align*}
 \begin{align*}
-&Alw(\forall l ((Occurs(CE,\ lab(\{l\})) \leftrightarrow Occurs(SE,\ l)) \wedge (Occurs(CE,\ lab(\{l\})) \rightarrow\\
-&attVal(lab(\{l\}),\ att_1) = f_1(attVal(l,\ att_1),\ ...,\ attVal(l,\ att_m)) \wedge\ ...\ \wedge\\
+&Alw(\forall l ((Occurs(CE,\ lab(\{l\})) \leftrightarrow Occurs(SE,\ l))\\
+&\wedge (Occurs(CE,\ lab(\{l\})) \rightarrow\ attVal(lab(\{l\}),\ att_1) =\\
+&f_1(attVal(l,\ att_1),\ ...,\ attVal(l,\ att_m)) \wedge\ ...\ \wedge\\
 &attVal(lab(\{l\}),\ att_n) = f_n(attVal(l,\ att_1),\ ...,\ attVal(l,\ att_m)))))
 \end{align*}
 
@@ -472,19 +473,39 @@ Event consumption is the ability to mark an event that previously matched in a p
 &\forall\ t > 0\ Futr(Consumed(r, l),\ t)))
 \end{align*}
 \begin{align*}
-&Alw(\forall l \in L, \forall e \in E, \forall r \in R, \forall S\\
-&((\neg \exists t > 0\ (Past(Occurs(e, lab(r, S),t))) \wedge\ l \in S)\\
-&\rightarrow\ \neg Consumed(r, l)))
+&Alw(\forall l \in L, \forall e \in E, \forall r \in R, \forall S\ ((\neg \exists t > 0\ (l \in S\ \wedge\\
+&Past(Occurs(e, lab(r, S),t)))) \rightarrow \neg Consumed(r, l)))
 \end{align*}
 We can use this predicate to describe rules with consuming clauses.
 \begin{align*}
-&define\ CE()\ from\ A()\ and\ each\ B()\ within\ x\ from\ A\ consuming\ B\ \triangleq\\
+&define\ CE()\ from\ A()\ and\ each\ B()\\
+&within\ x\ from\ A\ consuming\ B\ \triangleq
+\end{align*}
+\begin{align*}
 &Alw(\forall l_0, l_1 (Occurs(CE, lab(\{l_0, l_1\})) \leftrightarrow Occurs(A, l_0) \wedge\\
 &WithinP(Occurs(B, l_1), time(l_0), x) \wedge \neg Consumed(r, l_1)\\
-&Occurs(CE, lab(\{l_0, l_1\})) \rightarrow \forall t > 0 Futr(Consumed(r, l_1), t)))
+&Occurs(CE, lab(\{l_0, l_1\})) \rightarrow \forall t > 0\ Futr(Consumed(r, l_1), t)))
 \end{align*}
 
 \subsubsection{Hierarchies and iterations}
+Unlike other CEP languages, TESLA allows complex events, defined through rules, to be part of other detection patterns and not only to be used as subscription topics.
+
+The straight forward consequence is the possibility to create a hierarchical structure. The composition improves code organization, reuse and maintainability, which are fundamental goals of any programming language, but it also makes possible progressive data refinement, that eases development in contexts characterized by different layers of information detail.
+
+At the same time, complex events can be referenced in a recursive approach, that gives the power to express iterations without any additional language constructs. Iteration is necessary to analyze the evolution in time of the input flows and detect trends that could span over an undefined number of events.
+\begin{align*}
+&define\ RepA(Times, Val)\ from\ A()\\
+&where\ Times=1\ and\ Val=A.Val\\
+\\
+&define\ RepA(Times, Val)\ from\ A(\$x)\\
+&and\ last\ RepA(Val \le \$x)\ within\ 3 min\ from\ A\\
+&where\ Times=RepA.Times+1\ and\ Val = \$x\\
+&consuming\ RepA\\\\
+&define\ B(Times)\ from\ RepA()\\
+&where\ Times=RepA.Times
+\end{align*}
+
+This ability to create loops is powerful and tunable, but introduces the risk of non-termination typical of highly expressive languages.
 
 \section{Ambiguities and clarifications}
 
@@ -524,4 +545,5 @@ A practical solution is the one used by the reference implementation that breaks
 This approach is the most reasonable found so far and should be considered the standard, but the users should be aware of the implications and topic should remain open to further discussion.
 
 \subsection{Consuming}
-% TODO write about consuming incoherences between paper and implementation and about first and last
+% TODO maybe write about incoherences between paper and implementation
+Event consumption was always described in combination with $each$ selection policy, while the use of $first$ or $last$ wasn't really clarified. In particular, when the first (resp. last) event satisfying the pattern was already marked as consumed, it wasn't specified if the match should be considered terminated, without complex event emission, or the processor should just look for the next one that is not consumed. The reference implementation adopted the latter approach and we decided to take it as the standard.
