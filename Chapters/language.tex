@@ -1,12 +1,26 @@
 \chapter{Language extension}
 
-% TODO rationale on languages needs and choices
+\section{Introduction}
+In the past CEP was seen as a niche product, applied to systems focused exclusively on streams and real-time processing and used only when the constraints where so strict that were impossible to satisfy with standard databases. Those requirements had the maximum priority and users were willing to sacrifice convenience and integration to achieve the necessary speed.
 
-\section{Tesla BNF Grammar}
-% TODO add short intro
+Nowadays the increase in data production rate and the new trend of reactive and proactive systems is helping CEP and stream processing in general to gain popularity. In this new environment, requirements and architectures are often wider than just event handling and system integration is starting to get valued as much or even more than pure performance. The researchers are constantly exploring new techniques and the community is slowly building a uniform ecosystem that helps handling each part of the problem with the right tool.
 
-\subsection{Event type declaration}
-% TODO add short description
+As it is possible to grasp from what was written so far, one of the central topics about data management is the duality of static and streaming information, so it's easy to imagine that the interoperability of the two would play a big role in the field.\\
+Without a connection to a DBMS, whenever it is required to access some data outside the characteristic event payload, it is unavoidable to fall into cumbersome workarounds: one option is to attach the needed information to each event, the other it to simulate a database table with an everlasting events window filled with the entire dataset.
+
+For example let's say that we are processing information coming from a public transport network, we receive an event of a bus stuck in a traffic jam, the characteristic payload is the id of the bus and the amount of time it will delay its ride. If we would like to notify every bus stop on that line, we would first need to know on which line the bus is traveling.\\
+We could repeat the line information on every delay event. However one issue it that all the information would have to be provided by custom software from outside the engine, which implies technical expertise and effort. Moreover if we would like to know something else, like the capacity of the bus or the name of the driver, we would have to expand even more the payload and, every time a new field is required, we would have to restart the system to load the new event structure. Finally if there were more than an event originating from that bus, we would need to attach the same extras to each and every one of them.\\
+An alternative is to create a stream containing an event for each row in the dataset and use predicates with extremely broad windows that allow to interact with those entries at any time. This allows a better separation and it eases the introduction of new information sources. However it loses a lot of efficiency, making the engine almost unusable, because of its lack of optimizations and indexes.
+
+That said and before getting into the details of the presented solution, let's have an overview of the requirement and goals that influenced the design and development.\\
+The foundation is to keep it simple and natural, while preserving the baseline performances of a real-time process. We would also like to have the maximum expressivity and tunability of the system so that it can be adapted to any context and situation. From a developer point of view we want the code to be extensible to new storages and optimizations, while remaining organized and small enough for maintenance. Last but not least we want to continue to have a formal definition of every aspect of the language.
+
+In the following paragraphs I will propose some modifications to TESLA to mitigate the issues highlighted at the end of the previous chapter and an extension to express joins and filters over heterogeneous data sources. As before there will be two main sections: the first focused on syntax changes, the second concerning the semantic interpretation and specification.
+
+\section{Syntax extension}
+
+\subsection{Tuple declaration}
+This is an entirely new instruction that aims to provide all the required information for rules type-checking. In the beginning it is specified if the tuple is an event or a data row. The main part is the name of the tuple and the attributes types. At the end there is the assignment of a numerical id.
 \begin{bnf*}
 \bnfprod{declaration}{
     \bnfpn{declare} \bnfsp
@@ -48,8 +62,9 @@
 }
 \end{bnf*}
 
-\subsection{Event generation rule structure}
-% TODO add short description
+\subsection{Basic rule structure}
+The outline of the rule changes significantly in shape, but not in meaning. There are still four section, but they are renamed and reordered.\\
+Pattern detection clause at the beginning, then filtering, followed by definition and assignment, at the end event consumption. 
 \begin{bnf*}
 \bnfprod{rule}{
     \bnfpn{from} \bnfsp
@@ -59,36 +74,15 @@
 }
 \end{bnf*}
 
-\subsection{Outline of each section}
-% TODO add short description
+\subsection{From clause}
+The $from$ clause is moved at the beginning of the rule since, since the following sections rely on the tuples matched during this phase. As before it's composed by a sequence of predicates, that now can refer to static data.
 \begin{bnf*}
 \bnfprod{from}{
     \bnfts{from} \bnfsp
     \bnfpn{predicate body} \bnfsp
     \bnfpn{predicates}
-}\\
-\bnfprod{where}{
-    \bnfts{where} \bnfsp
-    \bnfpn{filters} \bnfor
-    \bnfes
-}\\
-\bnfprod{emit}{
-    \bnfts{emit} \bnfsp
-    \bnfpn{capital identifier} \bnfsp
-    \bnfts{(} \bnfsp
-    \bnfpn{evaluations} \bnfsp
-    \bnfts{)}
-}\\
-\bnfprod{consuming}{
-    \bnfts{consuming} \bnfsp
-    \bnfpn{capital identifier} \bnfsp
-    \bnfpn{capital identifiers} \bnfor
-    \bnfes
 }
 \end{bnf*}
-
-\subsection{Details for from}
-% TODO add short description
 \begin{bnf*}
 \bnfprod{predicates}{
     \bnfts{and} \bnfsp
@@ -103,8 +97,15 @@
 }
 \end{bnf*}
 
-\subsection{Details for where}
-% TODO add short description
+\subsection{Where clause}
+The keyword $where$ loses its previous meaning of assignment and gets closer to the SQL-like interpretation. The clause is composed by a sequence of boolean expression that filter the propagation of the event when the $from$ pattern is satisfied.
+\begin{bnf*}
+\bnfprod{where}{
+    \bnfts{where} \bnfsp
+    \bnfpn{filters} \bnfor
+    \bnfes
+}
+\end{bnf*}
 \begin{bnf*}
 \bnfprod{filters}{
     \bnfpn{expression} \bnfsp
@@ -119,12 +120,21 @@
 }
 \end{bnf*}
 
-\subsection{Details for emit}
-% TODO add short description
+\subsection{Emit clause}
+The old clause $define$ loses part its meaning because of event declaration, that now specify in advance all the events attributes, so it is joined to the old $where$ in the $emit$ clause. This section is composed by the name of the complex event and a chain of variable assignment.
+\begin{bnf*}
+\bnfprod{emit}{
+    \bnfts{emit} \bnfsp
+    \bnfpn{capital identifier} \bnfsp
+    \bnfpn{evaluations}
+}
+\end{bnf*}
 \begin{bnf*}
 \bnfprod{evaluations}{
+    \bnfts{(} \bnfsp
     \bnfpn{evaluation} \bnfsp
-    \bnfpn{evaluations tail} \bnfor
+    \bnfpn{evaluations tail} \bnfsp
+    \bnfts{)} \bnfor
     \bnfes
 }\\
 \bnfprod{evaluations tail}{
@@ -140,23 +150,32 @@
 }
 \end{bnf*}
 
-\subsection{Details for predicate body}
-% TODO add short description
+\subsection{Consuming clause}
+Event consumption preserves its position and syntax.
+\begin{bnf*}
+\bnfprod{consuming}{
+    \bnfts{consuming} \bnfsp
+    \bnfpn{capital identifier} \bnfsp
+    \bnfpn{capital identifiers} \bnfor
+    \bnfes
+}
+\end{bnf*}
+
+\subsection{Predicate body}
+To satisfy the goal of simplicity, we tried to reach a data format unification as tuples. That may not seem important, but it helps handling events and static data as similarly as possible. The predicate body, which describes tuple filtering, parameter assignment and alias definition, is one of main example this uniformity.
 \begin{bnf*}
 \bnfprod{predicate body}{
 	% TODO forbid param assignment in combination with 'not' 
     \bnfpn{capital identifier} \bnfsp
-    \bnfts{[} \bnfsp
     \bnfpn{assignments} \bnfsp
-    \bnfts{]} \bnfsp
-    \bnfts{(} \bnfsp
     \bnfpn{constraints} \bnfsp
-    \bnfts{)} \bnfsp
     \bnfpn{alias}
 }\\
 \bnfprod{assignments}{
+    \bnfts{[} \bnfsp
     \bnfpn{assignment} \bnfsp
-    \bnfpn{assignments tail} \bnfor
+    \bnfpn{assignments tail} \bnfsp
+    \bnfts{]} \bnfor
     \bnfes
 }\\
 \bnfprod{assignments tail}{
@@ -171,8 +190,10 @@
     \bnfpn{expression}
 }\\
 \bnfprod{constraints}{
+    \bnfts{(} \bnfsp
     \bnfpn{expression} \bnfsp
-    \bnfpn{constraints tail} \bnfor
+    \bnfpn{constraints tail} \bnfsp
+    \bnfts{)} \bnfor
     \bnfes
 }\\
 \bnfprod{constraints tail}{
@@ -188,8 +209,8 @@
 }
 \end{bnf*}
 
-\subsection{Details for event}
-% TODO add short description
+\subsection{Event}
+Starting from the common predicate body, events are characterized by windowing information and four types of selection, where $first$ and $last$ are based on the implicit ordering given by notification timestamps.
 \begin{bnf*}
 \bnfprod{event}{
     \bnfpn{event selection} \bnfsp
@@ -204,8 +225,9 @@
 }
 \end{bnf*}
 
-\subsection{Details for aggregates}
-% TODO add short description
+\subsection{Aggregates}
+Aggregates can be applied to both a window of events or to a collection of static data, with almost no difference.\\
+Moreover in this statement it isn't possible any more to express comparisons and constraints, instead we can assign the resulting value to a parameter and then use it in the where clause.
 \begin{bnf*}
 \bnfprod{aggregate}{
 	\bnfpn{aggregate assignment} \bnfsp
@@ -220,7 +242,7 @@
     \bnfpn{aggregator} \bnfsp
     \bnfts{(} \bnfsp
     \bnfpn{constrained tuple} \bnfsp
-    \bnfpn{timing} \bnfsp
+    \bnfpn{aggregate timing} \bnfsp
     \bnfts{)}
 }\\
 \bnfprod{aggregator}{
@@ -238,6 +260,10 @@
     \bnfts{)} \bnfsp
     \bnfpn{attribute selection}
 }\\
+\bnfprod{aggregate timing}{
+    \bnfpn{timing} \bnfor
+    \bnfes
+}\\
 \bnfprod{attribute selection}{
     \bnfts{.} \bnfsp
     \bnfpn{lower identifier} \bnfor
@@ -245,8 +271,8 @@
 }
 \end{bnf*}
 
-\subsection{Details for static}
-% TODO add short description
+\subsection{Static}
+Static predicates are really similar to event predicates, as we mentioned before, they share the core of parameters assignment and filtering, but also the selection policies. There is a catch though: static tuples don't have timestamps, so no need for windowing and no natural ordering. The lack of an order implies that whenever we want to use the operators $first$ and $last$ we have to describe how to sort data using their attributes in a SQL-like fashion.
 \begin{bnf*}
 \bnfprod{static}{
     \bnfpn{unordered static} \bnfor
@@ -289,8 +315,7 @@
 }
 \end{bnf*}
 
-\subsection{Details for timing}
-% TODO add short description
+\subsection{Timing}
 \begin{bnf*}
 \bnfprod{timing}{
     \bnfpn{within} \bnfor
@@ -322,8 +347,7 @@
 }
 \end{bnf*}
 
-\subsection{Details for expressions and constraints}
-% TODO add short description
+\subsection{Expressions and constraints}
 \begin{bnf*}
 \bnfprod{expression}{
     \bnfpn{parenthesization} \bnfor
@@ -372,7 +396,6 @@
 \end{bnf*}
 
 \subsection{Basic types}
-% TODO add short description
 \begin{bnf*}
 \bnfprod{capital identifier}{
     \bnftd{An identifier starting with an uppercase letter}
@@ -414,81 +437,106 @@
 
 \section{Semantic of rules}
 
-\subsection{Extension of logical concepts}
-The original paper defines the concept of $label$, to uniquely identify an event notification, the function $lab(Rule, Labels)$, to assign a label to a newly generated complex event, the trio predicate $Occurs(Type, Label)$ and the trio function $attVal(Label, Attribute)$.\\
-Static data are quite similar to event notifications, so it's simple to extend the previous concepts to take them in to account.
+\subsection{Extension of basic concepts}
+In the previous chapter we introduced the concept of $label$, the function TRIO $lab(Rule, Labels)$, the predicate $Occurs(Type, Label)$ and the function $attVal(Label, Attribute)$.\\
+Before we continue further, we have to adjust those concepts to take into account static data.
 
 \subsubsection{Labels and uniqueness of selection}
-We can extend the meaning of labels to identify data too, so that a label can be associated to an event notification or to a tuple and only one of them. In this way the function $lab$ isn't changed, making no distinction between what labels are associated to, and the \emph{uniqueness of selection} remains valid, because a trigger event is still required.
+We can extend the meaning of labels to identify data too, so that a label can be associated to an event notification or to a tuple and only one of them.\\
+In the same way we do for simple events, we assume the static collections to have been already labeled externally and so the function $lab$ remains unchanged, making no distinction between what a label is associated to.\\
+The \emph{uniqueness of selection} remains valid, because a trigger event is still required and that assures at least a different label for every new execution.
 
 \subsubsection{Definition of predicate $ThereIs$}
-The predicate $Occurs$ is not applicable, since a tuple remains unchanged in every time instant, so we define the predicate $ThereIs(Type, Label)$ for the similar purpose of stating that a label is associated to a tuple of a given type.
-
+The predicate $Occurs(Type, Label)$ is not applicable, since datasets remain unchanged in every time instant, so we define the predicate $ThereIs(Type, Label)$ with a similar meaning: it associates a label to a single tuple type.
 \begin{align*}
-  &Alw(\forall s \in S, \forall e \in E, \forall l \in L\\
-  &(ThereIs(s, l) \rightarrow Alw(\neg Occurs(e, l))))
+  &Alw(\forall s_1,s_2 \in S, \forall l \in L\ ((ThereIs(s_1, l) \wedge ThereIs(s_2, l)) \rightarrow s_1=s_2))
 \end{align*}
-
+If the label is associated to static data it cannot be tied to an event.
 \begin{align*}
-  &Alw(\forall s_1,s_2 \in S, \forall l \in L\\
-  &((ThereIs(s_1, l) \wedge ThereIs(s_2, l)) \rightarrow s_1=s_2))
+  &Alw(\forall s \in S, \forall e \in E, \forall l \in L\ (ThereIs(s, l) \rightarrow Alw(\neg Occurs(e, l))))
 \end{align*}
-
+Differently from $Occurs$, this predicate is time independent, so if it is satisfied in one instant it has to be true in any other.
 \begin{align*}
-  &Alw(\forall s \in S, \forall l \in L\\
-  &(ThereIs(s, l) \rightarrow Alw(ThereIs(s, l)))
-\end{align*}
-
-Where $L$ is the set of all labels, $E$ the set of all event types and $S$ the set of all static data types.\\
-The first formula states that a label cannot be associated with both a tuple and an event. The second states that cannot be two tuple having the same label and different data type. The third states that if a tuple exist at a certain point in time it exists along the whole time line.
+  &Alw(\forall s \in S, \forall l \in L\ (ThereIs(s, l) \rightarrow Alw(ThereIs(s, l)))
+\end{align*} 
+Where $L$ is the set of all labels, $E$ the set of all event types and $S$ the set of all static data types.
 
 \subsubsection{Extension of predicate $attVal$}
-Similarly the function $attVal$ can be extended to return attributes of static tuples.
+The function $attVal$ doesn't need to be syntactically modified, but should be extended to return attributes values of static tuples as well.
 
 \subsection{Event composition}
-% TODO add a short description
+Since the first predicate has to be a trigger event, it is pointless to make examples that do not include at least an additional predicate. So the base case is a complex event $CE$ generated every time the event $SE$ is notified and repeated for each entry found in the dataset $SD$.
 \begin{align*}% Example of each
-&from\ SE\ and\ each\ SD\ emit\ CE\ \triangleq\\
-&Occurs(CE, lab(r, \{l_0, l_1\})\ \leftrightarrow\\
-&(Occurs(SE, l_0)\ \wedge\ ThereIs(SD, l_1))
+from\ SE\ and\ each\ SD\ emit\ CE\ \triangleq
 \end{align*}
-
+\begin{align*}
+&Alw(\forall l_0, l_1 \in L\ (Occurs(CE, lab(r, \{l_0, l_1\})\ \leftrightarrow\\
+&(Occurs(SE, l_0)\ \wedge\ ThereIs(SD, l_1))))
+\end{align*}
+Using $not$ operator, a complex event is emitted only if there are no acceptable entries in the collection $SD$.
 \begin{align*}% Example of not
-&from\ SE\ and\ not\ SD\ emit\ CE\ \triangleq\\
-&Occurs(CE, lab(r, \{l_0\})\ \leftrightarrow\\
-&(Occurs(SE, l_0)\ \wedge\ \not \exists l_1 ThereIs(SD, l_1))
+from\ SE\ and\ not\ SD\ emit\ CE\ \triangleq
 \end{align*}
-
+\begin{align*}
+Alw(\forall l_0 \in L\ (Occurs(CE, lab(r, \{l_0\})\ \leftrightarrow\\
+(Occurs(SE, l_0)\ \wedge\ \neg \exists l_1 ThereIs(SD, l_1))))
+\end{align*}
+When we use the operators $first$ or $last$, we have to define an ordering so that the concept of coming first or last acquire its meaning. We assume single attributes to be comparable. The choice between the keywords $asc$ and $desc$ determine the direction of the comparison operator. Ties are broken using the label to impose a total ordering.
 \begin{align*}% Example of first
-&from\ SE\ and\ first\ SD\ order\ by\ Att_1\ emit\ CE\ \triangleq\\
-&Occurs(CE, lab(r, \{l_0, l_1\})\ \leftrightarrow\ (Occurs(SE, l_0)\ \wedge\ ThereIs(SD, l_1)\\
-&\wedge\ (\not \exists l_2\ (ThereIs(SD, l_2)\ \wedge\ (attVal(l_1, Att_1)\ <\ attVal(l_2, Att_1)))))
+from\ SE\ and\ first\ SD\ order\ by\ att_1\ asc\ emit\ CE\ \triangleq
 \end{align*}
-
-\begin{align*}% Example of last
-&from\ SE\ and\ last\ SD\ order\ by\ Att_1\ emit\ CE\ \triangleq\\
-&Occurs(CE, lab(r, \{l_0, l_1\})\ \leftrightarrow\ (Occurs(SE, l_0)\ \wedge\ ThereIs(SD, l_1)\\
-&\wedge\ (\not \exists l_2\ (ThereIs(SD, l_2)\ \wedge\ (attVal(l_1, Att_1)\ >\ attVal(l_2, Att_1)))))
+\begin{align*}
+&Alw(\forall l_0, l_1 \in L\ (Occurs(CE, lab(r, \{l_0, l_1\}))\ \leftrightarrow\\
+&(Occurs(SE, l_0)\ \wedge\ ThereIs(SD, l_1)\ \wedge\\
+&(\neg \exists l_2 \in L\ (ThereIs(SD, l_2)\ \wedge\ ((attVal(l_2, att_1)\ <\ attVal(l_1, att_1))\\
+&\lor\ (attVal(l_2, att_1)\ =\ attVal(l_1, att_1))\ \wedge\ (l_2 < l_1)))))))
 \end{align*}
-
+When there are multiple attributes in the ordering clause, they are checked in with lexicographical priority as in SQL.
+\begin{align*}% Example with multiple attr ordering
+from\ SE\ and\ first\ SD\ order\ by\ att_1\ asc,\ att_2\ desc\ emit\ CE\ \triangleq
+\end{align*}
+\begin{align*}
+&Alw(\forall l_0, l_1 \in L\ (Occurs(CE, lab(r, \{l_0, l_1\}))\ \leftrightarrow\\
+&(Occurs(SE, l_0)\ \wedge\ ThereIs(SD, l_1)\ \wedge\\
+&(\neg \exists l_2 \in L\ (ThereIs(SD, l_2)\ \wedge\ ((attVal(l_2, att_1)\ <\ attVal(l_1, att_1))\\
+&\lor\ (attVal(l_2, att_1)\ =\ attVal(l_1, att_1))\ \wedge\\
+&((attVal(l_2, att_2)\ >\ attVal(l_1, att_2))\ \lor\\
+&(attVal(l_2, att_2)\ =\ attVal(l_1, att_2))\ \wedge\ (l_2 < l_1))))))))
+\end{align*}
+Filtering in static data selection is the same as in event selection.
 \begin{align*}% Example of attribute constraint
-&from\ SE\ and\ each\ SD(Att_1\ op \ Val_1)\ emit\ CE\ \triangleq\\
-&Occurs(CE, lab(r, \{l_0, l_1\})\ \leftrightarrow\ (Occurs(SE, l_0)\\
-&\wedge\ ThereIs(SD, l_1)\ \wedge\ (attVal(l_1, Att_1)\ op\ Val_1))
+&from\ SE\ and\ each\ SD(expr(att_1))\ emit\ CE\ \triangleq
+\end{align*}
+\begin{align*}
+&Alw(\forall l_0, l_1 \in \L\ (Occurs(CE, lab(r, \{l_0, l_1\}))\ \leftrightarrow\\
+&(Occurs(SE, l_0)\ \wedge\ ThereIs(SD, l_1)\ \wedge\ Pred(attVal(l_1, att_1)))))
 \end{align*}
 
-\begin{align*}% Example of aggregates
-&from\ SE\ and\ AGGR(SD.Att_1)\ op\ Y\ emit\ CE\ \triangleq\\
-&Occurs(CE, lab(r, \{l_0\})\ \leftrightarrow\ (Occurs(SE, l_0)\\
-&\wedge\ \forall Set\ (\forall x, \forall l \in L
-(x \in Set\ \leftrightarrow\ (ThereIs(SD, l)\\
-&\wedge\ x\ =\ attVal(l, Att_1))))\ \wedge\ AGGR(Set)\ op\ Y)
-\end{align*}
-
+\subsubsection{Parameterization}
+Parameters have the new assignment syntax, but semantically preserve their meaning and expressivity.
 \begin{align*}% Example of parameters
-&from\ SE(Att_i\ = \ \$Par)\ and\ each\ SD(Att_j\ = \ \$Par)\ emit\ CE\ \triangleq\\
-&Occurs(CE, lab(r, \{l_0, l_1\})\ \leftrightarrow\ (Occurs(SE, l_0)\\
-&\wedge\ ThereIs(SD, l_1)\ \wedge\ (attVal(l_0, Att_i)\ =\ attVal(l_1, Att_j)))
+&from\ SE[\$par = att_i]()\ and\ each\ SD(att_j == \$par)\ emit\ CE\ \triangleq
+\end{align*}
+\begin{align*}
+&Alw(\forall l_0, l_1 \in L\ (Occurs(CE, lab(r, \{l_0, l_1\}))\ \leftrightarrow\ (Occurs(SE, l_0)\\
+&\wedge\ ThereIs(SD, l_1)\ \wedge\ (attVal(l_0, att_i)\ =\ attVal(l_1, att_j)))))
 \end{align*}
 
-% TODO maybe example of parametrization and aggregates?
+\subsubsection{Aggregates}
+To perform filtering using aggregates values now we have to make use of parameters assignment and the $where$ clause.
+\begin{align*}% Example of aggregates
+&from\ SE\ and\ \$par = AGGR(SD.att_1)\\
+&where\ expr(\$par)\ emit\ CE\ \triangleq
+\end{align*}
+\begin{align*}
+&Alw(\forall l_0 \in L\ (Occurs(CE, lab(r, \{l_0\}))\ \leftrightarrow\ (Occurs(SE, l_0)\\
+&\wedge\ \forall S\ (\forall s\ (s \in S\ \leftrightarrow\ \exists l \in L\ (s\ =\ \langle l,\ attVal(l, attr_1) \rangle\ \wedge\\
+&ThereIs(SD, l_1)))\ \rightarrow\ Pred(aggr(S))))))
+\end{align*}
+
+\subsubsection{Additional remarks}
+Also attribute assignment in the $emit$ clause has to make use of parameters: they are now the only notation to refer to information from another predicate or clause.
+% TODO maybe write formula
+
+Moreover, while with the selection policy $each$ may not be noticed, there is a semantic difference between filtering in the selection predicate or filtering in the where clause. The distinction appear in combination with $first$ and $last$: if filtering in the selection, the engine will search for the first (resp. last) tuple matching the constraints, if filtering inside the $where$ statement, the engine will retrieve the absolute first (resp. last) tuple and then apply the filter possibly preventing the event generation.
+% TODO maybe write formula

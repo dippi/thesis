@@ -19,32 +19,29 @@
 \usepackage{acronym}
 \usepackage[epsilon,tstt]{backnaur}
 
-\title{Static Data in CEP}
+\title{Static Data in TRex}
 \author{Angelo Di Pilla}
-
-%\includeonly{Chapters/tesla, Chapters/language, Chapters/sql}
 
 \begin{document}
 
 \maketitle
 
-% \include{FrontBackMatter/abstract}
+\include{FrontBackMatter/abstract}
 % TODO Riassunto in italiano
 % \include{FrontBackMatter/dedication}
 % \include{FrontBackMatter/acknowledgements}
 % \include{FrontBackMatter/declaration}
-% \include{FrontBackMatter/contents}
+\include{FrontBackMatter/contents}
 
 % Intro
 \include{Chapters/intro}
 
 % TODO CEP background
+\include{Chapters/cep}
 
 % TESLA and TREX and previous work
 % (Descrizione informale e citazione articoli)
 \include{Chapters/tesla}
-
-% TODO Goal and requirements: persistent data and challenges
 
 % Language syntax and semantic
 \include{Chapters/language}
@@ -53,18 +50,14 @@
 \include{Chapters/architecture}
 
 % First implementation SQL (w/ SQLite & C++)
-\include{Chapters/sql}
-
-% TODO Cache
-\include{Chapters/cache}
+\include{Chapters/impl}
 
 % TODO Results and performances
+\include{Chapters/results}
 
-% TODO state of the art
-% (spark? flink? esper?)
+% Conclusions
+\include{Chapters/conclusion}
 
-% TODO Future development (asynchronous computation & rule rewrite)
-
-% TODO Conclusions
+\include{FrontBackMatter/biblio}
 
 \end{document}

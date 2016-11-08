@@ -26,7 +26,7 @@ The outline of a rule is characterized by four main sections: definition of the 
 }
 \end{bnf*}
 
-\subsection{Details for define}
+\subsection{Define clause}
 The definition of a complex event is characterized by the name of the soon to be generated tuple and by a list of attributes names and types.
 \begin{bnf*}
 \bnfprod{define}{
@@ -62,7 +62,7 @@ The definition of a complex event is characterized by the name of the soon to be
 }
 \end{bnf*}
 
-\subsection{Details for from}
+\subsection{From clause}
 From clause is the core of pattern detection and is made of a sequence of predicates on different events and aggregates.
 \begin{bnf*}
 \bnfprod{from}{
@@ -84,7 +84,7 @@ From clause is the core of pattern detection and is made of a sequence of predic
 }
 \end{bnf*}
 
-\subsection{Details for where}
+\subsection{Where clause}
 The where section is composed by a set of assignments of the attributes of the soon to be generated event using arbitrary expression over the data processed in the pattern detection phase.
 \begin{bnf*}
 \bnfprod{where}{
@@ -111,7 +111,7 @@ The where section is composed by a set of assignments of the attributes of the s
 }
 \end{bnf*}
 
-\subsection{Details for consuming}
+\subsection{Consuming clause}
 Consumption policy is simply defined as a list of names of events, that took part in the from clause. 
 \begin{bnf*}
 \bnfprod{consuming}{
@@ -122,7 +122,7 @@ Consumption policy is simply defined as a list of names of events, that took par
 }
 \end{bnf*}
 
-\subsection{Details for predicate body}
+\subsection{Predicate body}
 The base of a predicate is made by a tuple constrained by a set of boolean expression over current event's data and parameters, possibly followed by an alias definition.
 \begin{bnf*}
 \bnfprod{predicate body}{
@@ -154,7 +154,7 @@ The base of a predicate is made by a tuple constrained by a set of boolean expre
 \end{bnf*}
 Note: in this formalization we use commas to separate constraint, opposed to $AND$ as in the original papers, to better distinguish predicates vs. filters composition.
 
-\subsection{Details for event}
+\subsection{Event}
 An event predicate (except the trigger one that we can see in the $from$ clause) adds to tuple filtering a selection policy chosen between $each, not, first, last$ and constraints about the time window.
 \begin{bnf*}
 \bnfprod{event}{
@@ -170,7 +170,7 @@ An event predicate (except the trigger one that we can see in the $from$ clause)
 }
 \end{bnf*}
 
-\subsection{Details for aggregates}
+\subsection{Aggregates}
 TESLA has the common aggregators that can be found in DBMS and other CEP engines, but the list could be extended if needed. They are applied on a set of tuples filtered in a similar way to event predicates and the result can be used in an additional constraint for the event pattern.
 \begin{bnf*}
 \bnfprod{aggregate}{
@@ -207,7 +207,7 @@ TESLA has the common aggregators that can be found in DBMS and other CEP engines
 }
 \end{bnf*}
 
-\subsection{Details for timing}
+\subsection{Timing}
 Time constraint is imposed with two different type of window: one of given duration from a starting event, the other delimited by a couple of distinct events.
 \begin{bnf*}
 \bnfprod{timing}{
@@ -240,7 +240,7 @@ Time constraint is imposed with two different type of window: one of given durat
 }
 \end{bnf*}
 
-\subsection{Details for expressions and constraints}
+\subsection{Expressions and constraints}
 Expressions in TESLA are common algebraic, boolean and string operations composed with each other and they can operate on immediate values, references to current tuple attributes or parameters.
 \begin{bnf*}
 \bnfprod{expression}{
@@ -373,7 +373,9 @@ Finally to reason about the content of an event we define the function $attVal(l
 As introduced during the syntax description, the $define$ statement declares the event to be generated and the rule is triggered as soon as a sequence of events satisfies the pattern of $from$ section.\\
 The simplest rule is the one that produces a complex event $CE$ for any notification of simple event $SE$.
 \begin{align*}
-&define\ CE()\ from\ SE()\ \triangleq\\
+&define\ CE()\ from\ SE()\ \triangleq
+\end{align*}
+\begin{align*}
 &Alw(\forall l(Occurs(CE,\ lab(\{l\})) \leftrightarrow Occurs(SE,\ l)))
 \end{align*}
 The next step is being able to filter the trigger event, using basic operations on its attributes. So that $CE$ is generated if and only if $SE$'s attributes matches the all the constraints.
@@ -412,13 +414,17 @@ To capture patterns of multiple events, TESLA provides some composition operator
 The operator $within$ defines a time range that goes from the occurrence of a specified event to a fixed amount of time in the past. The operator $between$ defines a time range delimited by two different events.\\
 The selection $each$ emits an event for every occurrence inside the specified window.
 \begin{align*}
-&define\ CE()\ from\ A()\ and\ each\ B()\ within\ x\ from\ A\ \ \triangleq\\
+&define\ CE()\ from\ A()\ and\ each\ B()\ within\ x\ from\ A\ \ \triangleq
+\end{align*}
+\begin{align*}
 &Alw(\forall l_0, l_1 \in L\ (Occurs(CE, lab(r, \{l_0, l_1\}))\ \leftrightarrow\\
 &(Occurs(A, l_0)\ \wedge\ WithinP(Occurs(B, l_1),\ time(l_0),\ x))))
 \end{align*}
 The selection $last$ emits a single event using the most recent occurrence in the window (ties are broken using an artificial total ordering on labels).
 \begin{align*}
-&define\ CE()\ from\ A()\ and\ last\ B()\ within\ x\ from\ A\ \ \triangleq\\
+&define\ CE()\ from\ A()\ and\ last\ B()\ within\ x\ from\ A\ \ \triangleq
+\end{align*}
+\begin{align*}
 &Alw(\forall l_0, l_1 \in L\ (Occurs(CE, lab(r, \{l_0, l_1\}))\ \leftrightarrow\\
 &(Occurs(A, l_0)\ \wedge\ WithinP(Occurs(B, l_1),time(l_0),x)\\
 &\wedge\ \neg (\exists l_2 \in L, \exists t\in [time(l_0), time(l_1))\ Past(Occurs(B, l_2),t))\\
@@ -426,7 +432,9 @@ The selection $last$ emits a single event using the most recent occurrence in th
 \end{align*}
 The selection $first$ emits a single event using the least recent occurrence in the window (ties are broken using an artificial total ordering on labels).
 \begin{align*}
-&define\ CE()\ from\ A()\ and\ first\ B()\ within\ x\ from\ A\ \ \triangleq\\
+&define\ CE()\ from\ A()\ and\ first\ B()\ within\ x\ from\ A\ \ \triangleq
+\end{align*}
+\begin{align*}
 &Alw(\forall l_0, l_1 \in L\ (Occurs(CE, lab(r, \{l_0, l_1\}))\ \leftrightarrow\\
 &(Occurs(A, l_0)\ \wedge\ WithinP(Occurs(B, l_1),time(l_0),x)\\
 &\wedge\ \neg (\exists l_2 \in L, \exists t\in (time(l_1), time(l_0) + x]\ Past(Occurs(B, l_2),t))\\
@@ -434,14 +442,18 @@ The selection $first$ emits a single event using the least recent occurrence in 
 \end{align*}
 The negation emits an event if there aren't occurrences in the window.
 \begin{align*}
-&define\ CE()\ from\ A()\ and\ not\ B()\ within\ x\ from\ A\ \ \triangleq\\
+&define\ CE()\ from\ A()\ and\ not\ B()\ within\ x\ from\ A\ \ \triangleq
+\end{align*}
+\begin{align*}
 &Alw(\forall l_0, l_1 \in L\ (Occurs(CE, lab(r, \{l_0, l_1\}))\ \leftrightarrow\\
 &(Occurs(A, l_0)\ \wedge\ \neg WithinP(Occurs(B, l_1),\ time(l_0),\ x))))
 \end{align*}
 The same principles apply with $between$ operator:
 \begin{align*}
 &define\ CE()\ from\ A()\ and\ each\ B()\ within\ x\ from\ A\\
-&and\ each\ C()\ between\ A\ and\ B\ \triangleq\\
+&and\ each\ C()\ between\ A\ and\ B\ \triangleq
+\end{align*}
+\begin{align*}
 &Alw(\forall l_0, l_1, l_2 \in L\ (Occurs(CE, lab(r, \{l_0, l_1, l_2\}))\ \leftrightarrow\\
 &(Occurs(A, l_0)\ \wedge\ WithinP(Occurs(B, l_1),\ time(l_0),\ x)\\
 &\wedge\ WithinP(Occurs(C, l_2),\ time(l_0),\ time(l_1) - time(l_0)))))
@@ -451,7 +463,9 @@ The same principles apply with $between$ operator:
 Parameters, identified by the leading dollar sign, work as variables to interconnect filter expressions in different predicates inside a rule. In TRIO they can be represented simply by adding an additional constraint to the formula.
 \begin{align*}
 &define\ CE()\ from\ A(att_0 = \$x)\ and\\
-&each\ B(att_2 < \$x)\ within\ x\ from\ A\ \ \triangleq\\
+&each\ B(att_2 < \$x)\ within\ x\ from\ A\ \ \triangleq
+\end{align*}
+\begin{align*}
 &Alw(\forall l_0, l_1 \in L\ (Occurs(CE, lab(r, \{l_0, l_1\}))\ \leftrightarrow\\
 &(Occurs(A, l_0)\ \wedge\ WithinP(Occurs(B, l_1),\ time(l_0),\ x)\\
 &\wedge attVal(l_0, att_0) > attVal(l_1, att_1))))
@@ -460,7 +474,9 @@ Parameters, identified by the leading dollar sign, work as variables to intercon
 \subsubsection{Aggregates}
 TESLA provides the most common aggregates function, that compute a single result from a set of events in a window. They can be used for filtering and for value assignment.
 \begin{align*}
-&AGGR(A.attr\ within\ x\ from\ B) = y\ \ \triangleq\\
+&AGGR(A.attr\ within\ x\ from\ B) = y\ \ \triangleq
+\end{align*}
+\begin{align*}
 &Alw(\forall S (\forall s (s \in S\ \leftrightarrow \exists l \in
 L (s = \langle l,\ attVal(l,attr) \rangle\\
 &\wedge\ WithinP(Occurs(A,l),\ Time(B),\ x))) \rightarrow\ aggr(S)=y))
@@ -509,7 +525,7 @@ This ability to create loops is powerful and tunable, but introduces the risk of
 
 \section{Ambiguities and clarifications}
 
-During the analysis of the previously defined syntax, it appeared clear the presence some ambiguities in the semantics of some specific TESLA rules and that, besides the additions of static data, a renewal of the whole language was appropriate.
+During the analysis of the previously defined syntax, it appeared clear the presence some ambiguities in the semantics of some specific TESLA rules and that, besides the additions of static data, a general renewal of the language was appropriate.
 
 \subsection{Parameters}
 In previous papers parameterization was presented only through examples and there was no explicit definition of its expressivity. So it wasn't clear if parameters needed two separate phases of assignment and usage or they could appear as free variables in high level logical constraints.\\

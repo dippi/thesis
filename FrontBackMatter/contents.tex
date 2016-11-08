@@ -3,10 +3,12 @@
 %*******************************************************
 \pdfbookmark[1]{\contentsname}{tableofcontents}
 
-\setcounter{tocdepth}{2} % <-- 2 includes up to subsections in the ToC
-\setcounter{secnumdepth}{3} % <-- 3 numbers up to subsubsections
+\setcounter{tocdepth}{3} % <-- 2 includes up to subsections in the ToC
+\setcounter{secnumdepth}{2} % <-- 3 numbers up to subsubsections
 
-\tableofcontents 
+\tableofcontents
+\addcontentsline{toc}{chapter}{Table of Contents}
+\markboth{TABLE OF CONTENTS}{}
 
 %*******************************************************
 % List of Figures and of the Tables
@@ -15,14 +17,14 @@
 %*******************************************************
 % List of Figures
 %*******************************************************    
-\pdfbookmark[1]{\listfigurename}{lof}
-\listoffigures
+%\pdfbookmark[1]{\listfigurename}{lof}
+%\listoffigures
 
 %*******************************************************
 % List of Tables
 %*******************************************************
-\pdfbookmark[1]{\listtablename}{lot}
-\listoftables
+%\pdfbookmark[1]{\listtablename}{lot}
+%\listoftables
   
 %*******************************************************
 % List of Listings
@@ -34,10 +36,10 @@
 %*******************************************************
 % Acronyms
 %*******************************************************
-\pdfbookmark[1]{Acronyms}{acronyms}
-\chapter*{Acronyms}
-\begin{acronym}[UML]
-    \acro{DRY}{Don't Repeat Yourself}
-    \acro{API}{Application Programming Interface}
-    \acro{UML}{Unified Modeling Language}
-\end{acronym} 
+%\pdfbookmark[1]{Acronyms}{acronyms}
+%\chapter*{Acronyms}
+%\begin{acronym}[UML]
+%    \acro{DRY}{Don't Repeat Yourself}
+%    \acro{API}{Application Programming Interface}
+%    \acro{UML}{Unified Modeling Language}
+%\end{acronym} 
