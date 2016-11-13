@@ -1,1 +1,31 @@
 \chapter{Results}
+
+\section{Introduction}
+% INTRODUCTION:
+% methodology and legacy from the previous system
+% environment software & hardware
+
+\section{Base performaces}
+\subsection{Rewrite vs TRex}
+% REWRITE vs TREX (no static)
+\subsection{Table simulation}
+% TABLE SIMULATION (long window)
+\subsection{Database}
+% DB INDEXING, SIZE, IN MEMORY
+
+\section{Cache}
+% YES vs NO
+\subsection{Shared vs per predicate}
+% SHARED vs PER_PREDICATE (no mutex contention vs slow cache fill)
+\subsection{Data distribution}
+% SIZE vs INPUT DATA DISTRIBUTION vs REPETITION OF PROCESSING
+\subsection{Algorithm comparison}
+% LRU_SIZE vs GDFS vs COLLISION (not a big difference, why?)
+
+\section{Additional factors}
+\subsection{Event selection policy}
+% EACH vs FIRST/LAST
+\subsection{Percentage of static predicates}
+% PERCENTAGE OF STATIC PREDICATES and SATURATION FREQUENCY
+\subsection{Parallelism}
+% N OF CORES

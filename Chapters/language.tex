@@ -464,7 +464,9 @@ Where $L$ is the set of all labels, $E$ the set of all event types and $S$ the s
 \subsubsection{Extension of predicate $attVal$}
 The function $attVal$ doesn't need to be syntactically modified, but should be extended to return attributes values of static tuples as well.
 
-\subsection{Event composition}
+\subsection{Specification}
+
+\subsubsection{Event composition}
 Since the first predicate has to be a trigger event, it is pointless to make examples that do not include at least an additional predicate. So the base case is a complex event $CE$ generated every time the event $SE$ is notified and repeated for each entry found in the dataset $SD$.
 \begin{align*}% Example of each
 from\ SE\ and\ each\ SD\ emit\ CE\ \triangleq
