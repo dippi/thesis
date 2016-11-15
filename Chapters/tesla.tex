@@ -9,7 +9,7 @@ TESLA reference implementation is TRex \cite{trex}, a CEP engine written in C++.
 
 While the specification of TESLA's semantic was a central topic of the very first paper, at the time of the writing the syntax was always described informally and through examples. This was identified as a risk of possible misunderstandings in the very foundation of the project, so as first thing in this chapter I will try to define the TESLA grammar in a more rigorous and hopefully clear way. Then I will summarize the previous writings about semantic and finally will highlight the inconsistencies between the semantics of TESLA and its actual implementation in the TRex engine, which aroused after system analysis and team discussion, followed by the clarifications or modifications proposed.
 
-\section{TESLA BNF Grammar}
+\section{BNF Grammar}
 
 Backus-Naur Form (BNF) is a notation for context-free grammars that allows to recursively define the composition of every single syntax feature. The components of this kind of writing are terminal symbols, that are simple strings possibly empty ($\epsilon$), and non terminal ones, that are wrapped in angle brackets. Each non terminal is defined in a derivation rule and on the right hand side there will be the non terminal name, while on the left one there will be a sequence of symbols possibly separated by a vertical line ($|$) to imply choice between options.
 

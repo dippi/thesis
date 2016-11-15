@@ -1,1 +1,34 @@
 \chapter{CEP background}
+
+\section{Introduction}
+Complex Event Processing (CEP) consists in analysis and manipulation of streams of data: starting from the simplest ones received as external input to the system, events are filtered, pattern matched, aggregated and combined into composite ones according to a given set of rules.
+
+CEP represents the dual to the classical databases model, in which data are usually static or changing at a relatively slow pace and queries vary from time to time, depending on the information required at the moment. CEP instead is characterized by persistent rules applied to a continuous flow of new data, which are strictly connected to time and rapidly aging.
+
+Before stepping into more advanced topics, in this chapter I will make an overview of the field of study, from a historical contextualization to the general concepts and terminology.
+
+\section{History and context}
+The discipline was born in the '90s as an evolution of publish-subscribe systems, to satisfy the needs of expressing patterns of multiple events rather than simple topic or content filtering. From that starting point it focused on real-time applications (like IoT sensors, fraud and emergencies detection, stock markets analysis, transportation) and developed high level languages and operators to support common time related tasks.
+
+% TODO: maybe talk about few implementation like Esper, WSO2, SQLstream and TRex
+
+In the meantime different approaches to Information Flow Processing (IFP) \cite{survey} arose from other research fields and complemented CEP requirements and features.\\
+For example the database community developed Data Stream Management Systems (DSMSs), which reduced everlasting streams to relational collections using windowing operators and manipulated them with continuous queries.\\
+More recently distributed streams processors started getting a lot of interest and traction from big tech companies as a new paradigm to handle extremely parallelized and throughput focused stream manipulations, in the same way Hadoop map-reduce revolutionized batch processing.
+
+Nowadays everything is slowly settling into a more unified and standardized ecosystem, tools are expanding their functionalities to match different needs of IFP and exploring the interaction with other systems and data sources.
+
+\section{Features}
+As mentioned before, CEP engines are characterized by the execution of persistent rules in low-latency applications and one of the main aspects that differentiate CEP from other similar technologies is its focus on events patterns, opposed to single events or batches.
+
+To ease rule development and optimization, CEP engines usually define a domain specific language (DSL). These DSL are typically declarative and somehow inspired to SQL, meaning that they allow to describe the desired solution in terms of which data to retrieve and under which constraints.\\
+There is a common base of operators and language constructs that can be found across most of the implementations, so let's try to review these building blocks and lay a terminology foundation for the chapters to come.
+
+First of all it is necessary to define a sequence of events described as some kind of list of event types that have to be notified to activate the rule. That sequence is characterized by relationships of happen-before and other time constraints to delimit the eligibility to be part of the pattern. In practice, there are operators to define windows in terms of duration or number of events or delimited by the occurrence of two events that acts as boundaries.\\
+In addition to temporal properties we need to apply filters based on content, so it is possible to write algebraic expressions, comparisons and possibly parameterization over the attributes of one or more events in the sequence.\\
+Sometimes it is required the ability to iterate over a unknown number of events to detect a trend, some others to negate a predicate, so that the rule is fulfilled if there are no events that match the filters.\\
+After a pattern is defined is important to declare selection policies, that are a way of expressing how many and which events satisfying the constraints should be picked for further processing. For example we might want to propagate only the most/least recent candidate.\\
+Then we need to transform the data, combining information from multiple events or running aggregate functions.\\
+Finally it may be desirable for an event notification to participate to a rule evaluation only once and then be discarded, waiting for new notifications. This practice is called event consumption and its effect and tunability can vary a lot from one implementation to another.
+
+% TODO maybe add timers for recurring eval
