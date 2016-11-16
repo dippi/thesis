@@ -10,6 +10,9 @@
   cleardoublepage=empty
 ]{scrbook}
 
+% To fix the usage of an old command
+\DeclareOldFontCommand{\it}{\normalfont\itshape}{\mathit}
+
 \usepackage{lipsum}
 \usepackage{listings}
 \usepackage[linedheaders,parts,pdfspacing,dottedtoc]{classicthesis}
@@ -18,6 +21,11 @@
 \usepackage{amsthm}
 \usepackage{acronym}
 \usepackage[epsilon,tstt]{backnaur}
+
+% To setup header and footer
+\clearscrheadfoot
+\chead[]{\headmark}
+\cfoot[\pagemark]{\pagemark}
 
 \usepackage{xcolor}
 \hypersetup{
