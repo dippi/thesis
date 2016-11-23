@@ -16,17 +16,17 @@ In addition to those safety benefits, there are several small improvements in te
 
 Initially, when I started looking component by component to get familiar with the codebase, I tried to refactor where possible. The results were interesting in terms of simplification and had no significant performance lost, but the method was slow: it needed a lot of care, extensive testing and code reviews. After a while I noticed that I was only scratching the surface and further improvements implied huge changes across the whole repository. The task seemed so overwhelming that I started thinking about a complete rewrite.\\
 The idea surely looked appealing and offered the opportunity to take only the best from years of experience, but it was extremely risky. Unable to choose, I kept cleaning and extending the old core and at the same I made some attempts to rethink the interfaces, I started experimenting with the different `variant` libraries and I even dived into the obscure albeit fascinating topic of template metaprogramming, in the hope of speeding up the development process.\\
-Finally I reached a turning point, I got stuck with the extension of TRex and every modification seemed to be inconclusive, so I gave the rewrite I real chance, but instead of using the aforementioned C++ libraries I decide to use Rust, a new language which offered the same advantages and even more. 
+Finally I reached a turning point, I got stuck with the extension of TRex and every modification seemed to be inconclusive, so I gave the rewrite I real chance, but instead of using the aforementioned C++ libraries I decided to use Rust, a new language which offers the same advantages and even more. 
 
 \section{Rust}
 Rust was born around 2010 as a side project of a Mozilla engineer and later backed by the company. The first pre-alpha release was reached in 2012 and the project hit version 1.0 in May 2015. So the language is pretty young and still missing some of its planned features, but many signs suggest that it may be on the right path.\\
-First of all, while in the past there were several radical changes, after they reached the release 1.0 they committed to stability and backward compatibility, adopting a well defined workflow based on reference proposals. However the project has kept evolving incredibly fast, with a release train model over 3 months windows.\\
+First of all, while in the past there were several radical changes, after they reached the release 1.0 they committed to stability and backward compatibility, adopting a well defined workflow based on reference proposals. However the project has kept evolving quickly, with a release train model over 3 months windows.\\
 Moreover it has raised a lot of interest within the community and there is a strong traction from a big company, ensuring continuity. Finally it is already used in production by Mozilla itself, Dropbox and Coursera among the others.
 
-Rust aims to be a safe and practical language for system programming, with particular attention to concurrency. Its syntax, modern and expressive, combines the best aspects of imperative, object oriented and functional programming, offering the right level of abstraction for any different task.\\
+Rust aims to be a safe and practical language for system programming, with particular attention to concurrency. Its syntax, modern and expressive, combines the best aspects of imperative, object oriented and functional programming, offering the right level of abstraction for many different task.\\
 The type-system, inspired by Haskell, is based on the concept of trait, which describe a property or a behavior of an object. Traits achieve their maximum utility in combination with generics, allowing code reuse while imposing clear restrictions on the applied types.\\
 Rust also implements some features typical of higher level languages, like advanced union types (enums in Rust jargon), tuples, type inference, destructuring and pattern matching.\\
-However the most prominent and peculiar characteristic is its unprecedented approach to safety with the concept of data ownership. Each object is tied to a single owner at a time, ownership can be transferred via assignment, return or function arguments and the content is moved and no longer accessible from the previous variable. If we want to access data without loosing ownership, it's possible to borrow multiple immutable references or a single mutable one, in the meantime the variable is considered blocked in something conceptually similar to a read-write lock. Every a reference is bounded by the lifetime of the referee and can't outlive the owner. In this way is always clear who is responsible for the resource and when the owner goes out of scope the object can be safely dropped.\\
+However the most prominent and peculiar characteristic is its unprecedented approach to safety with the concept of data ownership. Each object is tied to a single owner at a time, ownership can be transferred via assignment, return or function arguments and the content is moved and no longer accessible from the previous variable. If we want to access data without loosing ownership, it's possible to borrow multiple immutable references or a single mutable one, in the meantime the variable is considered blocked in something conceptually similar to a read-write lock. Every reference is bounded by the lifetime of the referee and can't outlive the owner. In this way is always clear who is responsible for the resource and when the owner goes out of scope the object can be safely dropped.\\
 All these constraints and other minor ones are statically checked by the compiler, which gives strong guarantees of memory safety with no runtime overhead.
 
 \begin{minipage}{\textwidth}
@@ -59,18 +59,44 @@ fn main() {
 \end{lstlisting}
 \end{minipage}\\
 
-Last but not least it worth mentioning that there is a growing ecosystem of tools and utilities, that ease setup and development. For example: rustup.rs is an automated setup and update script, cargo is a modern and simple package manager and build tool, crates.io is the official repository of open source libraries, rustfmt is a customizable code beautifier and racer is a code completion utility. It's also thanks to this simplicity of bootstrapping and distribution, that I was persuaded to adopt this new technology.
+Last but not least it worth mentioning that there is a growing ecosystem of tools and utilities, that ease setup and development. For example: rustup.rs is an automated setup and update script, cargo is a modern and simple package manager, build tool and documentation generator, crates.io is the official repository of open source libraries, rustfmt is a customizable code beautifier and racer is a code completion utility. It's also thanks to this simplicity of bootstrap and distribution, that I was persuaded to adopt this new technology.
 
 \section{Architecture}
+The TRex rewrite is composed by three crates (Rust jargon for packages): tesla, that contains basic engine interfaces and language structures, trex, that is the implementation of those traits, and benches,  a set of executables to test performances under simulated workload, on which we will focus in next chapter.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{tesla_classes}
+  \caption{tesla crate overview}
+\end{figure}
+
+In tesla package I extracted all the aspects that aren't implementation related, so that it could work as minimal contact point between components like library and server. The core of the package is made of two traits: `Engine`, that define methods for publish-subscribe, tuple declaration and rule definition, and `Subscriber`, that is used for event reception. Starting from these entry points the rest of the data structures just follows from the the information required: in particular we have two sub-packages `predicates` and `expressions`, the first contains all the tools to describe patterns of events and static data, the latter contains the AST of algebraic and comparison expressions. They both heavily leverage rust native union type, giving them a terse design compared to the possible equivalent with C++ `variant`.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{trex_components}
+  \caption{trex crate overview}
+\end{figure}
+
+The the structure of `trex` crate closely recalls the previous implementation, with some simplification and new abstractions.\\
+The core is `TRex` struct, that implements the `Engine` trait and acts as coordinator between the different components and the external world. When a new rule is defined `TRex` invokes the validation module and types, inferred using the previously collected tuple declarations, are checked to be used properly in expressions and assignments. If the rule satisfies the examination the engine create the dedicated processor through a provider, in a factory pattern. The processor is then indexed by the events that it's interested to receive and the system is ready to process incoming notifications. In the original project the indexing was more sophisticated than a single hash-map and had a mechanism to filter using predicates static constraints. In practice the alternative appears to work well enough and additional optimization could be added if needed.\\
+Anyway the most important changes are the ones concerning event processing components. The rule processor, which corresponds with `StackRule` class in C++, is responsible of dispatching incoming event to the correct predicates and, in case of trigger activation, of propagating the chain of evaluation. In the previous implementation the different types of predicates were strongly coupled all over the system and in particular `StackRule` had to handle all of them explicitly, with specific functions and storing them in separate collections. In the rewrite there is the trait `EventProcessor` which is implemented by any component that is going to act as a predicate evaluator. In this way everything is handled uniformly: event processors are instantiated through a provider and packed in a single collection, every time that a notification arrives each element of the list is notified and decide what to do with the data. When arrives a trigger event, an evaluation chain is started and the exchange data format between modules are `PartialResults`, which basically wrap together the parameters computed so far.\\
+This design choice made much easier to experiment with new data sources and hopefully is the base for future custom components to interoperate with different databases and technologies.
+\\
+\\
+
+Driver originale -> CDP [..............]
 
 \section{SQLite driver}
 % use SQLite C embedded API through rusqlite
-Once again lets start from the basic case
+[...........]
+
+The basic example is composed by an each predicate with no constraints nor parameters and, as we can see, the statement can be translated to a simple SQL select.
 \begin{align*}% Example of each
 &each\ SD\ \triangleq\\
 &SELECT\ 1\ FROM\ SD;
 \end{align*}
-
+When the predicate features a negation we can use the operator `NOT EXIST` that evaluate the result of a subquery and return false if there is some value in the result set.
 \begin{align*}% Example of not
 &not\ SD\ \triangleq\\
 &SELECT\ NOT\ EXIST\ (SELECT\ 1\ FROM\ SD);
@@ -78,33 +104,35 @@ Once again lets start from the basic case
 % SELECT (SELECT id FROM SD) IS NULL;
 % SELECT id FROM SD LIMIT 1;
 \end{align*}
-
+The selection policy `first` doesn't have an implicit absolute ordering to work with, so it has to define one. The order clause is directly mapped to SQL one.
 \begin{align*}% Example of first
 &first\ SD\ order\ by\ attr_1\ ASC,\ \ldots,\ attr_n\ DESC\ \triangleq\\
 &SELECT\ id\ FROM\ SD\\
 &ORDER\ BY\ attr_1\ ASC,\ \ldots,\ attr_n\ DESC\ LIMIT\ 1;
 \end{align*}
-
+For `last` selection policy is valid everything said for `first`, except for the mapping of the order, that is the opposite.
 \begin{align*}% Example of last
 &last\ SD\ order\ by\ attr_1\ ASC,\ \ldots,\ attr_n\ DESC\ \triangleq\\
 &SELECT\ id\ FROM\ SD\\
 &ORDER\ BY\ attr_1\ DESC,\ \ldots,\ attr_n\ ASC\ LIMIT\ 1;
 \end{align*}
-
+The use of constraints inside tuple brackets find its correspondence in the SQL where clause.
 \begin{align*}% Example of attribute constraint
 &each\ SD(attr_1\ op \ val_1,\ \ldots,\ attr_n\ op \ val_n)\ \triangleq\\
 &SELECT\ id\ FROM\ SD\\
 &WHERE\ attr_1\ op\ val_1\ AND\ \ldots\ AND\ attr_n\ op\ val_n;
 \end{align*}
-
+The definition of a parameter it's processed adding its value to the query return column.
 \begin{align*}% Example of parameter
 &each\ SD[\$param = attr_i,\ \ldots]\ \triangleq\\
 &SELECT\ attr_i\ as\ param,\ \ldots\ FROM\ SD;
 \end{align*}
-
+Finally the most common aggregation functions can be found in both the languages, so a translation is immediate.
 \begin{align*}% Example of aggregates
 &\$param\ =\ AGGR(SD.attr_1)\ \triangleq\\
 &SELECT\ AGGR(attr_1)\ as\ param\ FROM\ SD
 \end{align*}
 
 \section{Cache}
+
+[..........]
