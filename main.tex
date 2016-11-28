@@ -21,6 +21,12 @@
 \usepackage{amsthm}
 \usepackage{acronym}
 \usepackage[epsilon,tstt]{backnaur}
+\usepackage{caption}
+
+\usepackage[font=footnotesize]{caption}
+
+\usepackage{chngcntr}
+\counterwithin{figure}{chapter}
 
 \usepackage{graphicx}
 \graphicspath{ {Images/} }
@@ -41,6 +47,10 @@
     pdfauthor={Angelo Di Pilla}
 }
 
+\lstset{
+  basicstyle=\ttfamily\scriptsize,
+  columns=fixed
+}
 \lstMakeShortInline[columns=fixed]`
 
 \title{Static Data in TRex}

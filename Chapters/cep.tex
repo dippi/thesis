@@ -1,9 +1,9 @@
 \chapter{CEP background}
 
 \section{Introduction}
-Complex Event Processing (CEP) consists in analysis and manipulation of streams of data: starting from the simplest ones received as external input to the system, events are filtered, pattern matched, aggregated and combined into composite ones according to a given set of rules.
+\emph{Complex Event Processing} (CEP) consists in analysis and manipulation of streams of data, where each data item models an event occurring in an observed domain: starting from the primitive ones received as external input to the system, events are filtered, pattern matched, aggregated and combined into composite ones according to a given set of rules.
 
-CEP represents the dual to the classical databases model, in which data are usually static or changing at a relatively slow pace and queries vary from time to time, depending on the information required at the moment. CEP instead is characterized by persistent rules applied to a continuous flow of new data, which are strictly connected to time and rapidly aging.
+CEP represents the dual to the classical databases model, in which data are usually static or changing at a relatively slow pace and queries vary from time to time, depending on the information required at the moment. CEP instead is characterized by persistent rules applied to a continuous flow of new data.
 
 Before stepping into more advanced topics, in this chapter I will make an overview of the field of study, from a historical contextualization to the general concepts and terminology.
 
@@ -13,7 +13,7 @@ The discipline was born in the '90s as an evolution of publish-subscribe systems
 % TODO: maybe talk about few implementation like Esper, WSO2, SQLstream and TRex
 
 In the meantime different approaches to Information Flow Processing (IFP) \cite{survey} arose from other research fields and complemented CEP requirements and features.\\
-For example the database community developed Data Stream Management Systems (DSMSs), which reduced everlasting streams to relational collections using windowing operators and manipulated them with continuous queries.\\
+For example the database community developed Data Stream Management Systems (DSMSs), which reduced everlasting streams to relational collections using windowing operators and manipulating them with continuous queries.\\
 Moreover recently distributed streams processors started getting a lot of interest and traction from big tech companies as a new paradigm to handle extremely parallelized and throughput focused stream manipulations, in the same way Hadoop map-reduce revolutionized batch processing.
 
 Nowadays everything is slowly settling into a more unified and standardized ecosystem: tools are expanding their functionalities to match different needs of IFP and exploring the interaction with other systems and data sources.
