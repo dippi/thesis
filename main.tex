@@ -41,7 +41,7 @@
 \chead[]{\headmark}
 \cfoot[\pagemark]{\pagemark}
 
-\renewcommand{\baselinestretch}{1.0}
+%\renewcommand{\baselinestretch}{1.0}
 
 \usepackage{xcolor}
 \hypersetup{
@@ -55,7 +55,7 @@
 }
 
 \lstset{
-  basicstyle=\ttfamily\footnotesize,
+  basicstyle=\ttfamily\lst@ifdisplaystyle\footnotesize\fi,
   columns=fixed,
   captionpos=b,
   frame=leftline,
