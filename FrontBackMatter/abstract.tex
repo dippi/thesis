@@ -5,17 +5,17 @@
 \addcontentsline{toc}{chapter}{\tocEntry{Abstract}}
 \markboth{ABSTRACT}{}
 
-Data management systems over the years developed in two diametrical opposite fields of application: data storage and stream processing.\\
-Nowadays both approaches are wide spread and they are often required to cooperate toward common goals. However the integration of the two is still in an early stage of development and customized solutions for each specific deployment are usually required.
+Data management systems over the years evolved in two diametrically opposite fields of application: data storage and stream processing. Nowadays both the technologies are wide spread and they are often required to cooperate toward a common goal. However the integration of the two is still in an early stage of development and usually custom solutions are required for each specific deployment.
 
-The purpose of this thesis is to extend the TRex \emph{Complex Event Processing} engine \cite{trex} to allow a native and general purpose interoperability with relational databases and static data sources in general.\\
-The task will be studied starting from the language design and extension, with the goal of being a natural evolution of the current expressivity. Then an implementation will be presented, explaining the choice made and the key points of the processing strategies. Finally the results of performance testing will be analyzed in relation to the requirements typical of a real-time software.
+The purpose of the thesis is to model and evaluate a first-class and general purpose integration of static data sources into a \emph{Complex Event Processing} tool, like TRex \cite{trex}. To do so we present a reference implementation, going through the language extension, the key algorithms and the analysis the benchmark results.
+
+The project shows that events streams and data collections can be modeled with similar logical abstractions, simplifying the description of those problems that operate on the boundary of the two domains. At the same time the real-time performances can be preserved, within reasonable limits.
 
 \chapter*{Sommario}
 \addcontentsline{toc}{chapter}{\tocEntry{Sommario}}
 \markboth{SOMMARIO}{}
-I sistemi di data management nel corso degli anni si sono sviluppati in due campi di applicazione diametralmente opposti: immagazzinamento di informazioni e processazione di stream.\\
-Al giorno d'oggi entrambi gli approcci sono ampiamente diffusi e spesso è necessario che cooperino per il raggiungimento di comuni obiettivi. Tuttavia l'integrazione dei due è ancora in una fase iniziale di sviluppo e di solito sono necessarie soluzioni personalizzate allo specifico caso d'uso.
+I sistemi di data management nel corso degli anni si sono sviluppati in due campi di applicazione diametralmente opposti: immagazzinamento di informazioni e processazione di stream. Al giorno d'oggi entrambe le tecnologie sono ampiamente diffuse e spesso è necessario che cooperino per il raggiungimento di comuni obiettivi. Tuttavia l'integrazione delle due è ancora in una fase iniziale di sviluppo e solitamente si rendono necessarie soluzioni personalizzate per specifico caso d'uso.
 
-Lo scopo della tesi è di estendere il software di \emph{Complex Event Processing} TRex \cite{trex} per permettere una naturale e generalizzata interoperabilità con i database relazionali e altre sorgenti di dati statici.\\
-Il procedimento verrà studiato a partire dalla modellazione ed estensione del linguaggio, con l'obbiettivo di essere una naturale evoluzione dell'espressività attuale. A seguito verrà presentata un'implementazione, motivando le scelte fatte e i punti chiave del processo di esecuzione. In fine verranno analizzati i risultati di test di performance, in relazione con i tipici requisiti di un sistema real-time.
+Lo scopo della tesi è di modellare e validare gli effetti di un'in\-te\-gra\-zio\-ne di sorgenti di dati statici in un tool di \emph{Complex Event Processing} come TRex \cite{trex}. Per raggiungere questo obiettivo presentiamo un'implementazione di riferimento, spiegandone l'estensione del linguaggio e i principali algoritmi, e ne analizziamo le performance ed i limiti attraverso una serie di benchmark.
+
+Il progetto mostra come stream di eventi e collezioni di dati possano in effetti essere descritti con astrazioni logiche del tutto simili, permettendo di affrontare più facilmente problemi che operano sul confine tra i due domini. Inoltre evidenzia come le performance real-time possano essere preservate sotto ragionevoli condizioni.

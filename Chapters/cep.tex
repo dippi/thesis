@@ -1,7 +1,7 @@
 \chapter{CEP background}
 
 \section{Introduction}
-\emph{Complex Event Processing} (CEP) consists in analysis and manipulation of streams of data, where each data item models an event occurring in an observed domain: starting from the primitive ones received as external input to the system, events are filtered, pattern matched, aggregated and combined into composite ones according to a given set of rules.
+\emph{Complex Event Processing} (CEP) \cite{cep-book} consists in analysis and manipulation of streams of data, where each data item models an event occurring in an observed domain: starting from the primitive ones received as external input to the system, events are filtered, pattern matched, aggregated and combined into composite ones according to a given set of rules.
 
 CEP represents the dual to the classical databases model, in which data are usually static or changing at a relatively slow pace and queries vary from time to time, depending on the information required at the moment. CEP instead is characterized by persistent rules applied to a continuous flow of new data.
 
@@ -12,16 +12,16 @@ The discipline was born in the '90s as an evolution of publish-subscribe systems
 
 % TODO: maybe talk about few implementation like Esper, WSO2, SQLstream and TRex
 
-In the meantime different approaches to Information Flow Processing (IFP) \cite{survey} arose from other research fields and complemented CEP requirements and features.\\
-For example the database community developed Data Stream Management Systems (DSMSs), which reduced everlasting streams to relational collections using windowing operators and manipulating them with continuous queries.\\
-Moreover recently distributed streams processors started getting a lot of interest and traction from big tech companies as a new paradigm to handle extremely parallelized and throughput focused stream manipulations, in the same way Hadoop map-reduce revolutionized batch processing.
+In the meantime different approaches to \emph{Information Flow Processing} (IFP) \cite{ifp-survey} arose from other research fields and complemented CEP requirements and features.\\
+For example the database community developed \emph{Data Stream Management Systems} (DSMSs) \cite{dsms}, which reduced everlasting streams to relational collections using windowing operators and manipulating them with continuous queries.\\
+Moreover, recently \emph{distributed streams processors} started getting a lot of interest and traction from big tech companies as a new paradigm to handle extremely parallelized and throughput focused stream manipulations, in the same way Hadoop MapReduce \cite{map-reduce} revolutionized batch processing.
 
 Nowadays everything is slowly settling into a more unified and standardized ecosystem: tools are expanding their functionalities to match different needs of IFP and exploring the interaction with other systems and data sources.
 
 \section{Features}
 As mentioned before, CEP engines are characterized by the execution of persistent rules in low-latency applications and one of the main aspects that differentiate CEP from other similar technologies is its focus on events patterns, opposed to single events or batches.
 
-To ease rule development and optimization, CEP engines usually define a domain specific language (DSL). These DSL are typically declarative and somehow inspired to SQL, meaning that they allow to describe the desired solution in terms of which data to retrieve and under which constraints.\\
+To ease rule development and optimization, CEP engines usually define a \emph{domain specific language} (DSL). These DSL are typically declarative and somehow inspired to SQL, meaning that they allow to describe the desired solution in terms of which data to retrieve and under which constraints.\\
 There is a common base of operators and language constructs that can be found across most of the implementations, so let's try to review these building blocks and lay a terminology foundation for the chapters to come.
 
 First of all it is necessary to define a sequence of events described as some kind of list of event types that have to be notified to activate the rule. That sequence is characterized by relationships of happen-before and other time constraints to delimit the eligibility to be part of the pattern. In practice, there are operators to define windows in terms of duration or number of events or delimited by the occurrence of two events that acts as boundaries.\\

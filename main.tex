@@ -7,12 +7,14 @@
   11pt, a4paper,
   footinclude=true,
   headinclude=true,
-  cleardoublepage=empty
+  cleardoublepage=empty,
+  italian, american
 ]{scrbook}
 
 % To fix the usage of an old command
 \DeclareOldFontCommand{\it}{\normalfont\itshape}{\mathit}
 
+\usepackage[utf8]{inputenc}
 \usepackage{lipsum}
 \usepackage{listings}
 \usepackage[linedheaders,parts,pdfspacing,dottedtoc]{classicthesis}
@@ -22,6 +24,9 @@
 \usepackage{acronym}
 \usepackage[epsilon,tstt]{backnaur}
 \usepackage{caption}
+\usepackage{biblatex}
+
+\addbibresource{biblio.bib}
 
 \usepackage[font=footnotesize]{caption}
 
@@ -36,20 +41,26 @@
 \chead[]{\headmark}
 \cfoot[\pagemark]{\pagemark}
 
+\renewcommand{\baselinestretch}{1.0}
+
 \usepackage{xcolor}
 \hypersetup{
     colorlinks=true,
     linktocpage=true,
-    linkcolor={RoyalBlue},
-    citecolor={RoyalBlue},
-    urlcolor={RoyalBlue},
+    linkcolor={RoyalBlue},%{black},
+    citecolor={RoyalBlue},%{black},
+    urlcolor={RoyalBlue},%{black},
     pdftitle={Combining streaming events with static data in the Complex Event Processing tool T-Rex},
     pdfauthor={Angelo Di Pilla}
 }
 
 \lstset{
-  basicstyle=\ttfamily\scriptsize,
-  columns=fixed
+  basicstyle=\ttfamily\footnotesize,
+  columns=fixed,
+  captionpos=b,
+  frame=leftline,
+  numbers=left,
+  numbersep=5pt,
 }
 \lstMakeShortInline[columns=fixed]`
 

@@ -10,12 +10,12 @@ The TRex project, in its entirety, is composed of the engine library, a server, 
 
 At the beginning of the collaboration the TRex engine was a reasonably complex and well performing piece of software, although it showed several signs of its age. It was crafted over different iterations starting from 2010 and at that time C++ was still shaped according to its 12 years old original standardization. The very next year the C++11 standard came along, beginning an incredible period of renovation for both the language and the libraries, and the adoption of these new paradigms could really improve safety and extensibility.\\
 In particular the broad usage of dynamically allocated objects requires exceptional caution during refactoring, because any minimal oversight could lead to memory leaks or attempts to access freed memory. In TRex it was handled with manual reference counting, which is now replaceable by `shared_ptr<T>` that uses RAII to relieve the programmer from the responsibility of updating the count.\\
-Similarly a big part of the execution relies on the combination of type unions, enums and switches to describe and process TESLA expressions. The access to the wrong type or the absence of a switch case can cause bugs that aren't detected by the compiler and lead to unexpected runtime failures. In the upcoming C++17 the type `variant` will be added to the standard library (but it's already available in independent implementations) and it uses the power of template metaprogramming to prevent those issues at compile time.\\
+Similarly a big part of the execution relies on the combination of type unions, enums and switches to describe and process TESLA expressions. The access to the wrong type or the absence of a switch case can cause bugs that aren't detected by the compiler and lead to unexpected runtime failures. In the upcoming C++17 the type \emph{variant} will be added to the standard library (but it's already available in independent implementations) and it uses the power of template metaprogramming to prevent those issues at compile time.\\
 Moreover threading utilities and paradigms are continuously evolving and they offer new levels of abstraction that reduce the needs of synchronization and locking, improving performances and preventing data races and deadlocks.\\
 In addition to those safety benefits, there are several small improvements in terms of comprehensibility: like replacing array pointers with vectors, avoiding output arguments now that compilers handle efficiently the return statement, abandoning the cumbersome naming (inherited from the C tradition) for a wise usage of namespaces, adopting foreach loops and making use of idiomatic std functions.
 
 Initially, when I started looking component by component to get familiar with the codebase, I tried to refactor where possible. The results were interesting in terms of simplification and had no significant performance lost, but the method was slow: it needed a lot of care, extensive testing and code reviews. After a while I noticed that I was only scratching the surface and further improvements implied huge changes across the whole repository. The task seemed so overwhelming that I started thinking about a complete rewrite.\\
-The idea surely looked appealing and offered the opportunity to take only the best from years of experience, but it was extremely risky. Unable to choose, I kept cleaning and extending the old core and at the same I made some attempts to rethink the interfaces, I started experimenting with the different `variant` libraries and I even dived into the obscure albeit fascinating topic of template metaprogramming, in the hope of speeding up the development process.\\
+The idea surely looked appealing and offered the opportunity to take only the best from years of experience, but it was extremely risky. Unable to choose, I kept cleaning and extending the old core and at the same I made some attempts to rethink the interfaces, I started experimenting with the different variant` libraries and I even dived into the obscure albeit fascinating topic of template metaprogramming, in the hope of speeding up the development process.\\
 Finally I reached a turning point, I got stuck with the extension of TRex and every modification seemed to be inconclusive, so I gave the rewrite I real chance, but instead of using the aforementioned C++ libraries I decided to use Rust, a new language which offers the same advantages and even more. 
 
 \section{Rust}
@@ -28,36 +28,6 @@ The type-system, inspired by Haskell, is based on the concept of trait, which de
 Rust also implements some features typical of higher level languages, like advanced union types (enums in Rust jargon), tuples, type inference, destructuring and pattern matching.\\
 However the most prominent and peculiar characteristic is its unprecedented approach to safety with the concept of data ownership. Each object is tied to a single owner at a time, ownership can be transferred via assignment, return or function arguments and the content is moved and no longer accessible from the previous variable. If we want to access data without loosing ownership, it's possible to borrow multiple immutable references or a single mutable one, in the meantime the variable is considered blocked in something conceptually similar to a read-write lock. Every reference is bounded by the lifetime of the referee and can't outlive the owner. In this way is always clear who is responsible for the resource and when the owner goes out of scope the object can be safely dropped.\\
 All these constraints and other minor ones are statically checked by the compiler, which gives strong guarantees of memory safety with no runtime overhead.
-
-\begin{minipage}{\textwidth}
-\begin{lstlisting}[caption={Example of borrow},label={lst:borrow},xleftmargin=.2\textwidth]
-fn main() {
-  // `a` is the owner of `3`
-  let a = 3;
-
-  // Beginning of a scoped block
-  {
-    // `a` is immutably borrowed by `b`
-    let b = &a;
-    // `a` is borrowed again by `c`
-    let c = &a;
-    assert!(*b == *c)
-
-    // `a` can't be mutably borrowed
-    // This would fail to compile
-    let d = &mut a;
-
-    // End of borrows
-  }
-
-  // Here is ok to mutably borrow
-  let e = &mut a;
-
-  // End of borrow
-  // End of `a` scope, `3` dropped
-}
-\end{lstlisting}
-\end{minipage}\\
 
 Last but not least it worth mentioning that there is a growing ecosystem of tools and utilities, that ease setup and development. For example: rustup.rs is an automated setup and update script, cargo is a modern and simple package manager, build tool and documentation generator, crates.io is the official repository of open source libraries, rustfmt is a customizable code beautifier and racer is a code completion utility. It's also thanks to this simplicity of bootstrap and distribution, that I was persuaded to adopt this new technology.
 
