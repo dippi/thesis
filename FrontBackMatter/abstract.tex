@@ -7,7 +7,8 @@
 
 Data management systems over the years evolved in two diametrically opposite fields of application: data storage and stream processing. Nowadays both the technologies are widespread and they are often required to cooperate toward a common goal. However the integration of the two is still in an early stage of development and usually custom solutions are required for each specific deployment.
 
-The purpose of the thesis is to model and evaluate a native and general purpose integration of static data sources into the \emph{Complex Event Processing} tool \emph{T-Rex} \cite{trex}. To do so we present a reference implementation of an adapter to query a \emph{SQLite} database, going through the T-Rex rule language extension, the key algorithms and the analysis of benchmark results.
+The purpose of the thesis is to model and evaluate a native and general purpose integration of static data sources into the \emph{Complex Event Processing} tool \emph{T-Rex} \cite{trex}. To do so we extended and re-designed the T-Rex engine to integrate a static data source (namely a \emph{SQLite} database) with the event streams that flow into the engine. This required to go through the T-Rex rule language extension, followed by an elaboration of the key algorithms to efficiently process this new language, i.e., to combine static and streaming data, concluding with a careful analysis of the performance of the new engine.
+
 
 The project shows that events streams and data collections can be modeled with similar logical abstractions, simplifying the description of those problems that operate on the boundary of the two domains. At the same time the real-time performances of the original T-Rex implementation can be preserved, within reasonable limits.
 

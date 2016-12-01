@@ -564,3 +564,5 @@ This approach is the most reasonable found so far and should be considered the s
 \subsection{Consuming}
 % TODO maybe write about incoherences between paper and implementation
 Event consumption was always described in combination with $each$ selection policy, while the use of $first$ or $last$ wasn't really clarified. In particular, when the first (resp. last) event satisfying the pattern was already marked as consumed, it wasn't specified if the match should be considered terminated, without complex event emission, or the processor should just look for the next one that is not consumed. The reference implementation adopted the latter approach and we decided to take it as the standard.
+
+\enlargethispage{2\baselineskip}

@@ -177,6 +177,7 @@ The prepared statement produced is then stored for later use.
 When the evaluation start, the executor populates the query with the parameters contained in `PartialResult` and execute it through `rusqulite` library (that is a wrapper of C SQLite embedded API) and the result are processed and forwarded in the chain of evaluation.
 
 \section{Cache}
+\label{sec:cache-impl}
 To improve performance of data retrieval and try to keep the speed of execution above the constraints of real-time, a caching layer was added between the executor and the database.
 \begin{figure}[h]
   \centering

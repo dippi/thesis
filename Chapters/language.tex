@@ -1,11 +1,7 @@
 \chapter{Language extension}
 
 \section{Introduction}
-In the past CEP was seen as a niche product, applied to systems focused exclusively on streams and real-time processing and used only when the constraints where so strict that were impossible to satisfy with standard databases. Those requirements had the maximum priority and users were willing to sacrifice convenience and integration to achieve the necessary speed.
-
-Nowadays the increase in data production rate and the new trend of reactive and proactive systems is helping CEP and stream processing in general to gain popularity. In this new environment, requirements and architectures are often wider than just event handling and system integration is starting to get valued as much or even more than pure performance. The researchers are constantly exploring new techniques and the community is slowly building a uniform ecosystem that helps handling each part of the problem with the right tool.
-
-As it is possible to grasp from what was written so far, one of the central topics about data management is the duality of static and streaming information, so it's easy to imagine that the interoperability of the two would play a big role in the field.\\
+\label{sec:intro-lang-extension}
 Without a connection to a DBMS, whenever it is required to access some data outside the characteristic event payload, it is unavoidable to fall into cumbersome workarounds: one option is to attach the needed information to each event, the other it to simulate a database table with an everlasting events window filled with the entire dataset.
 
 For example let's say that we are processing information coming from a public transport network, we receive an event of a bus stuck in a traffic jam, the characteristic payload is the id of the bus and the amount of time it will delay its ride. If we would like to notify every bus stop on that line, we would first need to know on which line the bus is traveling.\\

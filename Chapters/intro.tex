@@ -1,19 +1,21 @@
 \chapter*{Introduction}
 \addcontentsline{toc}{chapter}{\tocEntry{Introduction}}
 \markboth{INTRODUCTION}{}
+In the past Complex Event Processing (CEP) \cite{cep-book} was seen as a specialized product, applied to systems focused exclusively on streams and real-time processing and used only when the constraints where so strict that were impossible to satisfy with standard databases. Those requirements had the maximum priority and users were willing to sacrifice convenience to achieve the necessary speed.
 
-\emph{Information Flow Processing} (IFP) \cite{ifp-survey} is a data management paradigm born to overcome the limits of the classical relational model to timely respond to a continuous stream of events. In particular Complex Event Processing (CEP) \cite{cep-book}, a branch of IFP that focuses on the identification of patterns of events, has recently gained popularity in a wide range of real-time application domains and, due its increasing adoption, it is raising a need for a natural interaction with persistent data sources.
+Nowadays the increase in data production rate and the new trend of reactive and proactive systems is helping CEP and stream processing in general to gain popularity. In this new environment, requirements and architectures are often wider than just event handling and system integration is starting to get valued as much or even more than pure performance.
 
-This thesis investigates the feasibility and limits of an integration between the T-Rex CEP engine and the SQLite database engine, showing that static data can find a natural fit into the TESLA rule definition language and that the performance of an embedded database can satisfy the requirements of a real time execution, especially if in combination with a cache mechanism. We also highlight how the response time of the external \emph{DBMS} and the cache friendliness of the processed data remain strict requirements for a practical usability.
+This thesis investigates the feasibility and limits of an interoperability between the T-Rex CEP engine and the SQLite database engine, showing that static data can find a natural fit into the \emph{TESLA}\footnote{TESLA is the T-Rex rule specification language} \cite{tesla} rule definition language and that the performance of an embedded database can satisfy the requirements of a real time execution, especially if in combination with a cache mechanism. We also highlight how the response time of the external \emph{DBMS} and the cache friendliness of the processed data remain strict requirements for a practical usability.
 
 In particular my contribution were:
-\begin{itemize}
-\setlength\itemsep{0em}
-\item Identification of ambiguities in some \emph{TESLA} \cite{tesla} operators and proposal of refinements, supported by a formal definition of the syntax, that was previously presented mostly by examples.
+\begin{itemize}[noitemsep,topsep=0pt]
+%\setlength\itemsep{0em}
+\item Identification of ambiguities in some TESLA operators and proposal of refinements, supported by a formal definition of the syntax, which was previously presented mostly by examples.
 \item Rewrite of the T-Rex engine to make it more robust, extensible and accurate with respect to the specification.
-\item Design and formalization of a syntactic and semantic extension of the TESLA language.
-\item Development of the integration of the T-Rex engine with the SQLite database and introduction of a caching layer.
+\item Design and formalization of a syntactic and semantic extension of the TESLA language to seamlessly combine event streams with static, relational data.
+\item Development of the integration of the T-Rex engine with the SQLite database to interpret the new rule language, and introduction of a caching layer to improve performance in accessing static data.
 \end{itemize}
 
-The rest of the thesis is organized as follows: the first chapter introduces the field of study, providing a basic overview of features and terminology related with Information Flow Processing and Complex Event Processing in particular. The second chapter presents TESLA and T-Rex, analyzing their strengths and weakness. The third chapter describes the way we extended the TESLA language to enable CEP rules that seamlessly combine static and streaming data. The fourth chapter explains the architecture of the system and the algorithms used. The fifth chapter studies, through a wide set of benchmarks, how the various design choices we made impact the performance of the resulting system, under various conditions. The last chapter draws the conclusions and proposes future development.
+The rest of the thesis is organized as follows: the first chapter introduces the field of study, providing a basic overview of features and terminology related with Information Flow Processing and Complex Event Processing in particular. The second chapter presents TESLA and T-Rex, analyzing their strengths and weakness. The third chapter describes the way we extended the TESLA language to enable CEP rules that seamlessly combine static and streaming data. The fourth chapter explains the architecture of the system and the algorithms used. The fifth chapter studies, through a wide set of benchmarks, how the various design choices we made impact the performance of the resulting system, under various conditions. The last chapter draws the main conclusions and proposes future development.
 
+\enlargethispage{2\baselineskip}

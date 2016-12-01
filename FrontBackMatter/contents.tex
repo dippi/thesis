@@ -1,13 +1,12 @@
 %*******************************************************
 % Table of Contents
 %*******************************************************
-\addcontentsline{toc}{chapter}{\tocEntry{Table of Contents}}
-\markboth{TABLE OF CONTENTS}{}
-
 \setcounter{tocdepth}{3} % <-- 2 includes up to subsections in the ToC
 \setcounter{secnumdepth}{2} % <-- 3 numbers up to subsubsections
 
 \tableofcontents
+\addcontentsline{toc}{chapter}{\tocEntry{Table of Contents}}
+\markboth{TABLE OF CONTENTS}{}
 
 %*******************************************************
 % List of Figures and of the Tables
@@ -17,9 +16,9 @@
 % List of Figures
 %*******************************************************    
 %\pdfbookmark[1]{\listfigurename}{lof}
+\listoffigures
 \addcontentsline{toc}{chapter}{\tocEntry{List of Figures}}
 \markboth{LIST OF FIGURES}{}
-\listoffigures
 
 %*******************************************************
 % List of Tables
@@ -32,9 +31,9 @@
 %******************************************************* 
 % TODO fix listings visualization
 %\pdfbookmark[1]{\lstlistoflistings}{lol}
+\lstlistoflistings
 \addcontentsline{toc}{chapter}{\tocEntry{List of Listings}}
 \markboth{LIST OF LISTINGS}{}
-\lstlistoflistings
    
 %*******************************************************
 % Acronyms
